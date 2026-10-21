@@ -73,6 +73,22 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   The old list measured 46 of 9,884 (0.5%) but included all single letters, so the two
   numbers are not directly comparable.
 
+### 2026-10-21 Identifier protection (MI-20, MI-21)
+
+- New acceptance cases I01 to I11 written first; six failed before the change (`my_ai`
+  fell back to Zhuyin, `a@su3.com` became Chinese, and URLs and paths got full-width
+  `：` and `／`). All 32 cases pass after it; the four negative cases (sentence
+  punctuation stays full-width) passed before and after.
+- The key notation gained shifted symbols (`@`, `:`, `<S-->` for `_`) with a behavior
+  test; a second behavior test checks the preedit of a URL in full-width mode.
+- `cargo test --workspace` passes; tools tests pass.
+- Evaluation sampling was not deterministic: phrases with the same text but different
+  readings kept hash-map order, so the exact count moved between 4,404 and 4,408 across
+  runs. The sample is now sorted by text and readings. With that fix, the engine before
+  and after this change gives identical evaluation output: 4,940 phrases, 0 leaked,
+  4,405 exact (89.2%); 2,858 mixed sentences, 0 wrong; 21 of 10,000 English words
+  misjudged.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

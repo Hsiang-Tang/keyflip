@@ -11,8 +11,10 @@ Windows typing behavior is unverified.
 
 ## Verified
 
-- Core: 21 acceptance cases, 18 behavior tests, 5 protocol tests, 2 C-interface
+- Core: 32 acceptance cases, 20 behavior tests, 5 protocol tests, 2 C-interface
   tests; `cargo test --workspace` passes.
+- Identifier protection (MI-20, MI-21): `_` and `@` keep an English word going, and
+  URLs, paths, and identifiers keep half-width punctuation in full-width mode.
 - Evaluation: 4,940 Chinese phrases with 0 leaking into English (89.2% exactly
   correct); 2,858 Chinese-English-Chinese sentences with 0 errors; 21 of 10,000
   English words misjudged (0.2%).

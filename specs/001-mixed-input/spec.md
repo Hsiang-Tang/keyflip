@@ -68,6 +68,20 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 - MI-18 Punctuation is half-width by default; Shift+Space toggles full-width mode, and
   pressing again returns.
 
+### Identifier protection
+
+- MI-20 After an English word or a number, Shift+`-` (`_`) and Shift+`2` (`@`) join the
+  word: they are English characters and the letters and digits after them stay English
+  with no Zhuyin judgment (`my_ai`, `name@site`). With nothing English before them they
+  are ordinary punctuation.
+- MI-21 Punctuation inside a code-like token stays half-width even in full-width mode. A
+  token is a run of English letters, digits, and punctuation with no space and no Chinese.
+  A punctuation mark is inside the token when a letter or digit follows it in the token
+  and either a letter or digit precedes it, or it and everything before it in the token
+  are path leads `~`, `/`, `.`, `\` (`https://site.com`, `src/app/main.rs`, `~/src`).
+  Punctuation that ends a token, or that opens one in front of a word (`(` in `(API)`),
+  follows the full-width setting.
+
 ### Quality
 
 - MI-19 Evaluation: no lexicon phrase is converted to English; the misjudgment rate on the
@@ -78,5 +92,6 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 
 - Two-letter abbreviations (`ai`, `jp`, `up`, `i`) are judged Chinese by default and
   recovered with Enter or Tab. Whether to improve this is left to real usage data.
-- Identifier protection (`snake_case`, paths, URLs) relies on structural rules for now,
-  with no dedicated classifier; see `docs/ROADMAP.md`.
+- Identifier protection covers joiners and punctuation width (MI-20, MI-21). Splitting a
+  token into protected ranges for the shell (KnowType's range list) waits for a shell
+  that needs it.

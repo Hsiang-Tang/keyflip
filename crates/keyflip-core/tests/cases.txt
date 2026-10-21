@@ -5,9 +5,11 @@
 # Key notation (standard zhuyin layout, US keyboard):
 #   a-z 0-9 , . ; / - '   the physical key, no Shift
 #   A-Z                   Shift + that letter
+#   ~ ! @ # $ % ^ & * ( ) + { } | : " ?   Shift + the key that types them
+#   <S-k>                 Shift + plain key k, e.g. <S--> types _
 #   _                     space bar
 #   <E> Enter   <T> Tab   <L> Left   <R> Right   <D> Down   <B> Backspace
-#   <S-E>                 Shift + Enter
+#   <S-E>                 Shift + Enter   <S-_> Shift + Space (full-width toggle)
 # Expected is the concatenation of everything the engine committed.
 # {sp} stands for a space (trailing spaces are easy to lose in editors).
 
@@ -43,3 +45,16 @@ B03	su3cl3Hsiang_su3cl3<E>	你好Hsiang 你好
 # --- recovery ---
 R01	ai<T><E>	ai
 R02	su3cl3<L><B><E>	好
+
+# --- identifier protection (MI-20, MI-21) ---
+I01	my<S-->ai_su3<E>	my_ai 你
+I02	a@su3.com<E>	a@su3.com
+I03	<S-_>FOO<S-->BAR<E>	FOO_BAR
+I04	<S-_>https://ai.com<E>	https://ai.com
+I05	<S-_>src/ai/main.rs<E>	src/ai/main.rs
+I06	<S-_>~/ai<E>	~/ai
+I07	<S-_>su3cl3_https://ai.com<E>	你好https://ai.com
+I08	<S-_>Hsiang,su3<E>	Hsiang，你
+I09	<S-_>Note:su3<E>	Note：你
+I10	<S-_>su3cl3(API)<E>	你好（API）
+I11	<S-_>API/su3cl3<E>	API／你好

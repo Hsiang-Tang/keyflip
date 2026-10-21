@@ -44,8 +44,10 @@ enum Kind {
 #[derive(Debug, Clone)]
 struct Group {
     kind: Kind,
-    /// Output character for Latin and Punct groups.
+    /// Output character for Latin and Punct groups (Punct is stored half-width).
     ch: char,
+    /// Punct typed in full-width mode; rendered full-width unless protected.
+    wide: bool,
     fixed: Option<String>,
 }
 
@@ -54,6 +56,7 @@ impl Group {
         Group {
             kind: Kind::Latin,
             ch: c,
+            wide: false,
             fixed: None,
         }
     }
@@ -62,6 +65,7 @@ impl Group {
         Group {
             kind: Kind::Syllable(reading),
             ch: ' ',
+            wide: false,
             fixed: None,
         }
     }
@@ -102,7 +106,17 @@ pub struct Engine {
 }
 
 fn is_word_char(c: char) -> bool {
-    c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_' | '\'')
+    c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_' | '\'' | '@')
+}
+
+/// Shifted symbols that continue an English word or number (MI-20).
+fn is_joiner(c: char) -> bool {
+    matches!(c, '_' | '@')
+}
+
+/// Leading path characters that may open a protected token (`~/`, `./`, `\\`).
+fn is_path_lead(c: char) -> bool {
+    matches!(c, '~' | '/' | '.' | '\\')
 }
 
 impl Engine {
@@ -272,8 +286,12 @@ impl Engine {
                 self.insert(Group::latin(up));
             } else {
                 let t = ev.text.unwrap_or(c);
-                let g = self.punct_group(t);
-                self.insert(g);
+                if is_joiner(t) && (self.in_word() || self.in_number()) {
+                    self.insert(Group::latin(t));
+                } else {
+                    let g = self.punct_group(t);
+                    self.insert(g);
+                }
             }
             return;
         }
@@ -427,11 +445,8 @@ impl Engine {
     fn punct_group(&self, c: char) -> Group {
         Group {
             kind: Kind::Punct,
-            ch: if self.full_width {
-                zhuyin::full_width_of(c)
-            } else {
-                c
-            },
+            ch: c,
+            wide: self.full_width,
             fixed: None,
         }
     }
@@ -642,11 +657,35 @@ impl Engine {
                 }
                 i += units.len();
             } else {
-                out[i] = self.groups[i].ch.to_string();
+                let g = &self.groups[i];
+                let ch = if g.wide && !self.is_protected(i) {
+                    zhuyin::full_width_of(g.ch)
+                } else {
+                    g.ch
+                };
+                out[i] = ch.to_string();
                 i += 1;
             }
         }
         out
+    }
+
+    /// Punctuation at `i` sits inside a code-like token and stays half-width (MI-21).
+    fn is_protected(&self, i: usize) -> bool {
+        let in_token = |g: &Group| !g.is_syllable() && g.ch != ' ';
+        let alnum = |g: &Group| matches!(g.kind, Kind::Latin) && g.ch.is_ascii_alphanumeric();
+        let mut start = i;
+        while start > 0 && in_token(&self.groups[start - 1]) {
+            start -= 1;
+        }
+        let followed = self.groups[i + 1..]
+            .iter()
+            .take_while(|g| in_token(g))
+            .any(alnum);
+        let before = &self.groups[start..i];
+        followed
+            && (before.iter().any(alnum)
+                || self.groups[start..=i].iter().all(|g| is_path_lead(g.ch)))
     }
 
     fn commit_all(&mut self, commit: &mut String) {

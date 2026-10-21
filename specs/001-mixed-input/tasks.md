@@ -13,8 +13,9 @@ Format: task, requirements covered, verification, status.
   `cargo run --release -p keyflip-cli -- eval`. Status: done.
 - T-MI-5 Setting for space between Chinese and English. Requirement MI-6. Verification: new
   acceptance case. Status: engine option exists; shell settings UI not done.
-- T-MI-6 Identifier protection (ruhi's classification rules, KnowType's range list).
-  Requirement: new. Status: not started; see `docs/ROADMAP.md`.
+- T-MI-6 Identifier protection. Requirements MI-20, MI-21. Verification: acceptance cases
+  I01 to I11 and two behavior tests. Status: done (2026-10-21) for joiners and punctuation
+  width; a protected-range list in the snapshot waits for a shell that needs it.
 - T-MI-7 Tab prediction (version 2). Status: not started.
 
 Rule: never delete or loosen a case to make an implementation pass. New behavior gets a

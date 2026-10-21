@@ -83,7 +83,7 @@ fn eval() {
         .entries()
         .filter(|e| e.readings.len() >= 2 && e.readings.len() <= 4 && e.count >= 30)
         .collect();
-    phrases.sort_by(|a, b| a.text.cmp(&b.text));
+    phrases.sort_by(|a, b| a.text.cmp(&b.text).then_with(|| a.readings.cmp(&b.readings)));
     for e in phrases.iter().step_by(5) {
         let Some(keys) = e
             .readings

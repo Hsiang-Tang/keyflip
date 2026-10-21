@@ -104,6 +104,18 @@ A judgment can always be changed:
   is a tone key and forms a legal syllable they are Zhuyin, otherwise they are sent as
   punctuation.
 - `.`, `-`, `_`, `'` inside an English word are always half-width.
+- Identifier protection (MI-20, MI-21). Shift+`-` and Shift+`2` after an English word or
+  number are stored as English characters, so the word keeps going (`my_ai` does not fall
+  back to Zhuyin at `ai`). Other punctuation is stored half-width with a flag recording
+  that it was typed in full-width mode; the full-width form is chosen when the text is
+  rendered, not when the key is typed. Rendering checks the token around the mark: inside
+  a code-like token (word characters after it, and word characters or only path leads
+  `~ / . \` before it) the mark stays half-width. Deciding at render time means a mark
+  typed before the rest of the URL is corrected as soon as the next letter arrives, and
+  Backspace restores the full-width form. This follows ruhi's rule that identifiers are
+  never split and KnowType's token-shape checks, without KnowType's regex and whitelist
+  approach, which misread `user.name` as a URL. The snapshot does not yet expose protected
+  ranges; no shell needs them.
 
 ## Known limits (first version)
 

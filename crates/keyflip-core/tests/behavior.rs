@@ -181,3 +181,25 @@ fn up_arrow_is_swallowed_while_composing_so_hosts_do_not_clear_the_text() {
     assert!(snap.handled);
     assert_eq!(snap.preedit_text(), "你好");
 }
+
+#[test]
+fn notation_types_shifted_symbols_with_their_physical_key() {
+    let evs = parse_keys("<S-->@:").unwrap();
+    let got: Vec<(KeyCode, Option<char>, bool)> =
+        evs.iter().map(|e| (e.code, e.text, e.shift)).collect();
+    assert_eq!(
+        got,
+        vec![
+            (KeyCode::Char('-'), Some('_'), true),
+            (KeyCode::Char('2'), Some('@'), true),
+            (KeyCode::Char(';'), Some(':'), true),
+        ]
+    );
+}
+
+#[test]
+fn protected_url_shows_half_width_while_typing_in_full_width_mode() {
+    let mut e = engine();
+    let snap = feed(&mut e, "<S-_>https://ai.c");
+    assert_eq!(snap.preedit_text(), "https://ai.c");
+}

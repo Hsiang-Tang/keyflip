@@ -14,8 +14,8 @@ Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
 
 4. Settings UI: space between Chinese and English (off by default), full-width default.
 5. Input method icon and menu name (the macOS icon is blank today).
-6. Identifier protection: port ruhi's classification rules (`snake_case`,
-   `kebab-case`, paths, `.json`) and output the protected ranges (KnowType's way).
+6. Identifier protection: joiners and punctuation width done 2026-10-21 (MI-20, MI-21).
+   Remaining: output protected ranges in the snapshot once a shell needs them.
 7. Windows: run `installer/install.ps1` on a machine with administrator rights and
    verify with `specs/002-platform-shells/windows.md`. Rebuild `dist/`; the current
    binaries predate the engine's Up-arrow change and are stale.

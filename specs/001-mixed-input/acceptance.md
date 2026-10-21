@@ -8,6 +8,8 @@ Never delete or loosen a case to make an implementation pass.
 ## Key notation
 
 - `a-z 0-9 , . ; / - '` are physical keys, `A-Z` is Shift plus a letter, `_` is Space.
+- `~ ! @ # $ % ^ & * ( ) + { } | : " ?` are Shift plus the key that types them; `<S-k>`
+  is Shift plus the plain key `k` (`<S-->` types `_`, `<S-,>` and `<S-.>` type `<` `>`).
 - `<E>` Enter, `<S-E>` Shift+Enter, `<T>` Tab, `<L>` `<R>` `<D>` `<U>` arrow keys,
   `<B>` Backspace, `<X>` Esc, `<S-_>` Shift+Space.
 
@@ -22,6 +24,15 @@ Positive cases (English where it should be English, Chinese where it should stay
 - Digits: `192.168.1.1`, `2026`, `user2024` stay as typed; `3` followed by Chinese splits
   into "3" plus the Chinese word; `2026` followed by a Chinese unit splits.
 - Mixed text: English then Chinese, and Chinese then English.
+
+Identifier protection (MI-20, MI-21)
+
+- After an English word, `_` and `@` keep the word going: `my_ai` stays English, and so
+  does `a@su3.com`.
+- In full-width mode, punctuation inside URLs, paths, and identifiers stays half-width:
+  `https://ai.com`, `src/ai/main.rs`, `~/ai`, `FOO_BAR`.
+- Sentence punctuation still follows the setting: `Hsiang，`, `Note：`, `（API）`, and
+  `API／` before Chinese stay full-width.
 
 Negative cases (must not be misjudged)
 
