@@ -16,6 +16,8 @@ struct EngineState {
     var candidates: [String]?
     var selected: Int
     var pageSize: Int
+    /// The grid of every candidate, `pageSize` per row.
+    var expanded: Bool
     var fullWidth: Bool
 }
 
@@ -56,10 +58,12 @@ final class EngineSession {
         var items: [String]?
         var selected = 0
         var pageSize = 9
+        var expanded = false
         if let c = object["candidates"] as? [String: Any] {
             items = c["items"] as? [String]
             selected = c["selected"] as? Int ?? 0
             pageSize = c["page_size"] as? Int ?? 9
+            expanded = c["expanded"] as? Bool ?? false
         }
         return EngineState(
             handled: object["handled"] as? Bool ?? false,
@@ -69,6 +73,7 @@ final class EngineSession {
             candidates: items,
             selected: selected,
             pageSize: max(pageSize, 1),
+            expanded: expanded,
             fullWidth: object["full_width"] as? Bool ?? false
         )
     }

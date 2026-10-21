@@ -16,6 +16,10 @@ Format: task, requirements covered, verification, status.
 - T-MI-6 Identifier protection. Requirements MI-20, MI-21. Verification: acceptance cases
   I01 to I11 and two behavior tests. Status: done (2026-10-21) for joiners and punctuation
   width; a protected-range list in the snapshot waits for a shell that needs it.
+- T-MI-8 Expanded candidate grid. Requirement MI-22. Verification: five behavior tests,
+  a protocol compatibility test, and a rendered screenshot of the macOS grid. Status: done
+  in the engine and the macOS shell (2026-10-21); the Windows candidate window still draws
+  the page that holds the selection, not the full grid.
 - T-MI-7 Tab prediction (version 2). Status: not started.
 
 Rule: never delete or loosen a case to make an implementation pass. New behavior gets a

@@ -75,7 +75,10 @@ final class KeyflipInputController: IMKInputController {
 
         if let items = state.candidates {
             let caret = caretRect(of: client)
-            CandidatePanel.shared.show(items: items, selected: state.selected, pageSize: state.pageSize, caret: caret)
+            CandidatePanel.shared.show(
+                items: items, selected: state.selected, pageSize: state.pageSize,
+                expanded: state.expanded, caret: caret
+            )
         } else {
             CandidatePanel.shared.hide()
         }

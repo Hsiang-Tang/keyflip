@@ -73,6 +73,9 @@ pub struct WireCandidates {
     pub items: Vec<String>,
     pub selected: usize,
     pub page_size: usize,
+    /// Grid of every candidate, `page_size` per row. Absent from older engines.
+    #[serde(default)]
+    pub expanded: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -162,10 +165,12 @@ fn state_of(s: Snapshot) -> Response {
                  items,
                  selected,
                  page_size,
+                 expanded,
              }| WireCandidates {
                 items,
                 selected,
                 page_size,
+                expanded,
             },
         ),
         full_width: s.full_width,
@@ -362,6 +367,13 @@ mod tests {
         assert_eq!(out[0], Response::Pong);
         assert!(matches!(out[1], Response::Error { .. }));
         assert!(matches!(out[2], Response::Error { .. }));
+    }
+
+    #[test]
+    fn candidates_from_an_older_engine_read_as_not_expanded() {
+        let c: WireCandidates =
+            serde_json::from_str(r#"{"items":["a"],"selected":0,"page_size":9}"#).unwrap();
+        assert!(!c.expanded);
     }
 
     #[test]

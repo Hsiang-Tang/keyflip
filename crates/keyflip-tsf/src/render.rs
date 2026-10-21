@@ -112,6 +112,7 @@ mod tests {
             items: (0..n).map(|i| format!("字{i}")).collect(),
             selected,
             page_size,
+            expanded: false,
         }
     }
 

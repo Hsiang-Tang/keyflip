@@ -89,6 +89,18 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   4,405 exact (89.2%); 2,858 mixed sentences, 0 wrong; 21 of 10,000 English words
   misjudged.
 
+### 2026-10-21 Expanded candidate grid (MI-22)
+
+- Requested from the first macOS hand test: Left and Down were not enough to browse
+  candidates. Right now expands the window into a grid.
+- Five behavior tests (expand, arrows by item and row, digit picks from the selected
+  row, Esc returns to the list, Left in the compact list keeps MI-11) and a protocol test
+  (a reply without `expanded` reads as not expanded). `cargo test --workspace` passes.
+- `macos/build.sh --no-install` succeeds. The panel code was run on its own with 36
+  candidates and screenshotted: four rows of nine in aligned columns, the selected row at
+  full strength, the others dimmed, the selection highlighted.
+- Not verified: the grid during real typing; Windows draws no grid.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

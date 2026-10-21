@@ -203,3 +203,62 @@ fn protected_url_shows_half_width_while_typing_in_full_width_mode() {
     let snap = feed(&mut e, "<S-_>https://ai.c");
     assert_eq!(snap.preedit_text(), "https://ai.c");
 }
+
+/// Opens the window on a syllable with many candidates.
+fn open_window(e: &mut Engine) -> Snapshot {
+    feed(e, "u4");
+    feed(e, "<D>")
+}
+
+#[test]
+fn right_expands_the_candidate_window_into_a_grid() {
+    let mut e = engine();
+    let compact = open_window(&mut e);
+    let c = compact.candidates.expect("window open");
+    assert!(!c.expanded);
+    assert!(c.items.len() > 9, "needs more than one row to test");
+    let grid = feed(&mut e, "<R>").candidates.expect("still open");
+    assert!(grid.expanded);
+    assert_eq!(grid.selected, 0, "expanding does not move the selection");
+}
+
+#[test]
+fn grid_arrows_move_by_item_and_by_row() {
+    let mut e = engine();
+    open_window(&mut e);
+    feed(&mut e, "<R>");
+    assert_eq!(feed(&mut e, "<R>").candidates.unwrap().selected, 1);
+    assert_eq!(feed(&mut e, "<D>").candidates.unwrap().selected, 10);
+    assert_eq!(feed(&mut e, "<L>").candidates.unwrap().selected, 9);
+    assert_eq!(feed(&mut e, "<U>").candidates.unwrap().selected, 0);
+}
+
+#[test]
+fn grid_digit_picks_from_the_selected_row() {
+    let mut e = engine();
+    let items = open_window(&mut e).candidates.unwrap().items;
+    feed(&mut e, "<R><D>");
+    let snap = feed(&mut e, "2");
+    assert!(snap.candidates.is_none(), "picking closes the window");
+    let out = feed(&mut e, "<E>").commit;
+    assert_eq!(out, items[10]);
+}
+
+#[test]
+fn esc_in_the_grid_returns_to_the_compact_list_first() {
+    let mut e = engine();
+    open_window(&mut e);
+    feed(&mut e, "<R>");
+    let snap = feed(&mut e, "<X>");
+    assert!(!snap.candidates.expect("still open").expanded);
+    assert!(feed(&mut e, "<X>").candidates.is_none());
+    assert!(!feed(&mut e, "<E>").commit.is_empty(), "composition survives");
+}
+
+#[test]
+fn left_in_the_compact_list_still_closes_and_moves_the_cursor() {
+    let mut e = engine();
+    open_window(&mut e);
+    let snap = feed(&mut e, "<L>");
+    assert!(snap.candidates.is_none());
+}

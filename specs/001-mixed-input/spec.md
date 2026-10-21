@@ -53,6 +53,11 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 - MI-11 Left selects the previous character and Down opens candidates, as in New Zhuyin.
 - MI-12 Esc closes the candidate window first; only without one does it clear the
   composition.
+- MI-22 Right while the candidate window is open expands it into a grid that shows every
+  candidate, nine per row. In the grid, Left and Right move one item, Up and Down move one
+  row, a digit picks from the selected row, Enter picks the selected item, and Esc first
+  returns to the compact list. Left in the compact list keeps MI-11 (it closes the window
+  and moves the cursor).
 
 ### Shell interaction
 

@@ -21,6 +21,8 @@ pub struct Candidates {
     pub items: Vec<String>,
     pub selected: usize,
     pub page_size: usize,
+    /// The grid showing every candidate, `page_size` per row (MI-22).
+    pub expanded: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]

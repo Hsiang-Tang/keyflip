@@ -89,6 +89,7 @@ struct Window {
     target: usize,
     cands: Vec<Candidate>,
     sel: usize,
+    expanded: bool,
 }
 
 #[derive(Clone)]
@@ -571,6 +572,7 @@ impl Engine {
             target,
             cands,
             sel: 0,
+            expanded: false,
         });
     }
 
@@ -603,6 +605,30 @@ impl Engine {
                 }
                 Some(true)
             }
+            KeyCode::Right if !w.expanded => {
+                w.expanded = true;
+                Some(true)
+            }
+            KeyCode::Right => {
+                w.sel = (w.sel + 1) % n;
+                Some(true)
+            }
+            KeyCode::Left if w.expanded => {
+                w.sel = (w.sel + n - 1) % n;
+                Some(true)
+            }
+            KeyCode::Down if w.expanded => {
+                if w.sel + PAGE_SIZE < n {
+                    w.sel += PAGE_SIZE;
+                }
+                Some(true)
+            }
+            KeyCode::Up if w.expanded => {
+                if w.sel >= PAGE_SIZE {
+                    w.sel -= PAGE_SIZE;
+                }
+                Some(true)
+            }
             KeyCode::Down => {
                 w.sel = (w.sel + 1) % n;
                 Some(true)
@@ -619,6 +645,10 @@ impl Engine {
             KeyCode::Enter if !ev.shift => {
                 let idx = w.sel;
                 self.select_candidate(idx);
+                Some(true)
+            }
+            KeyCode::Esc if w.expanded => {
+                w.expanded = false;
                 Some(true)
             }
             KeyCode::Esc => {
@@ -748,6 +778,7 @@ impl Engine {
             items: w.cands.iter().map(|c| c.text.clone()).collect(),
             selected: w.sel,
             page_size: PAGE_SIZE,
+            expanded: w.expanded,
         });
         Snapshot {
             handled,

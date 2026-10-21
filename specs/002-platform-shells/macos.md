@@ -97,6 +97,8 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 - [ ] Shift+Enter while composing behaves the same: the first confirms, the second breaks
       the line.
 - [ ] `su3cl3`, Left, Down: the candidate window appears; a digit picks; Enter confirms.
+- [ ] With the candidate window open, Right expands it into a grid of every candidate;
+      arrows move, a digit picks from the highlighted row, Esc returns to the list.
 - [ ] The candidate window appears next to the cursor without covering the text being
       typed; at the bottom of the screen it appears above.
 - [ ] A Shift tap, a CapsLock tap, and a CapsLock long press change nothing about input.
