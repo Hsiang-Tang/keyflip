@@ -216,6 +216,9 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   the app icon, which did not exist. `macos/make-icon.swift` now also draws
   `AppIcon.icns` (the same arrows on a light rounded square); `CFBundleIconFile` added.
   The menu bar icon is unchanged. Not yet seen in the switcher (icon cache).
+- Hand test: Right does not help in the YouTube Music search box either (the log
+  shows the same host commit after Right). Other web pages complete with Tab. Recorded
+  as a known limit in TP-8; a shell repair was drafted, never tested, and removed.
 - `cargo test --workspace` passes; evaluation output identical.
 
 ### Not verified

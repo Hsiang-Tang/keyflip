@@ -66,6 +66,10 @@ only if daily use shows a real need.
   the old composition (seen in the YouTube Music search box, 2026-10-21; a plain input
   and Notes work). Pages rarely act on Right, and shells accept suggestions with it
   (fish, zsh-autosuggestions).
+- Known limit: the YouTube Music search box acts on Right as well (Google-style search
+  boxes accept their own inline completion with Tab and Right), so completion does not
+  work there. Repairing it in the shell after the page's commit was considered and
+  dropped by the maintainer (2026-10-21): one site, and other pages work.
 
 ## Acceptance cases
 
