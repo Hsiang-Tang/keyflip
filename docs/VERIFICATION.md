@@ -114,6 +114,18 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
 - `cargo test --workspace` passes (38 cases). Evaluation output is identical to the
   previous run.
 
+### 2026-10-21 Chinese right after an English word (MI-23)
+
+- Maintainer report: `enter` followed by Zhuyin with no Space became one long English
+  word. Cases G01 to G07 written first; G01 to G03 failed.
+- The evaluator gained two lines. "Glued zh+en+zh" types phrase, English word, phrase
+  with no Space (first-tone tails skipped): 1,682 of 1,682 wrong before, 17 (1.0%) after.
+  The remaining failures are inflection ambiguity (`lists`, `aged`, `sends`). "English +
+  digit" types 2,925 words and identifiers followed by a tone digit: 7 changed before
+  (`mp3`, `x86` and other short pending runs, unrelated to this change), 8 after; the new
+  one is lowercase `gpt4`, accepted because Tab recovers it.
+- All other evaluation lines are unchanged. `cargo test --workspace` passes (45 cases).
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

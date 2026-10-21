@@ -15,6 +15,8 @@ Windows typing behavior is unverified.
   tests; `cargo test --workspace` passes.
 - Identifier protection (MI-20, MI-21): `_` and `@` keep an English word going, and
   URLs, paths, and identifiers keep half-width punctuation in full-width mode.
+- Enter commits what is shown (MI-7, changed by the maintainer); Chinese may follow an
+  English word with no Space (MI-23): glued sentences 1.0% wrong, down from 100%.
 - Expanded candidate grid (MI-22): Right opens a grid of every candidate; the macOS
   grid was rendered and inspected, not yet used by hand. Windows shows only the page
   holding the selection.

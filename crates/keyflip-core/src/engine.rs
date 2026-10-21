@@ -13,6 +13,8 @@ use crate::snapshot::{Candidates, SegKind, Segment, Snapshot};
 use crate::zhuyin;
 
 const PAGE_SIZE: usize = 9;
+/// Words ranked inside this many count as English for splitting (MI-23).
+const WORD_RANK_CUTOFF: u32 = 10_000;
 
 #[derive(Debug, Clone)]
 pub struct Options {
@@ -296,6 +298,9 @@ impl Engine {
             }
             return;
         }
+        if zhuyin::tone_of_key(c).is_some() && self.split_word_tail(c) {
+            return;
+        }
         if self.in_path() && (is_word_char(c) || c == '/') {
             self.flush_pending();
             self.insert(Group::latin(c));
@@ -510,6 +515,68 @@ impl Engine {
             i -= 1;
         }
         i < self.cursor && has_letter
+    }
+
+    /// MI-23: a tone key after an English word turns the word's tail (plus any
+    /// pending keys) into a syllable when the rest is a real word and the whole
+    /// run is not. A head found in the word list wins with the shortest tail;
+    /// otherwise a Shift-started head or one that cannot be zhuyin wins with the
+    /// longest tail.
+    fn split_word_tail(&mut self, tone: char) -> bool {
+        let mut start = self.cursor;
+        while start > 0 {
+            let g = &self.groups[start - 1];
+            if !matches!(g.kind, Kind::Latin) || !is_word_char(g.ch) {
+                break;
+            }
+            start -= 1;
+        }
+        if start == self.cursor || !self.groups[start..self.cursor].iter().any(|g| g.ch.is_ascii_alphabetic()) {
+            return false;
+        }
+        let mut keys: Vec<char> = self.groups[start..self.cursor].iter().map(|g| g.ch).collect();
+        let held = self.pending.len();
+        keys.extend(self.pending.iter());
+        let whole: String = keys.iter().collect::<String>().to_ascii_lowercase();
+        if self.eng.rank(&whole).is_some_and(|r| r < WORD_RANK_CUTOFF) {
+            return false;
+        }
+        let mark = zhuyin::tone_of_key(tone).expect("tone key");
+        let listed = |head: &[char]| {
+            self.eng
+                    .rank(&head.iter().collect::<String>().to_ascii_lowercase())
+                    .is_some_and(|r| r < WORD_RANK_CUTOFF)
+        };
+        let structural = |head: &[char]| {
+            head[0].is_ascii_uppercase()
+                || (head.len() >= 3 && !zhuyin::symbols_of_keys(head).is_some_and(|sy| self.lex.is_prefix(&sy)))
+        };
+        let fits = |k: usize| -> Option<String> {
+            let (head, tail) = keys.split_at(keys.len() - k);
+            if tail.iter().any(|c| c.is_ascii_uppercase()) || !head.iter().all(|c| c.is_ascii_alphabetic()) {
+                return None;
+            }
+            let reading = format!("{}{mark}", zhuyin::symbols_of_keys(tail)?);
+            self.lex.is_syllable(&reading).then_some(reading)
+        };
+        let max_k = 4.min(keys.len() - 1);
+        let lo = held.max(1);
+        let choice = (lo..=max_k)
+            .find_map(|k| fits(k).filter(|_| listed(&keys[..keys.len() - k])).map(|r| (k, r)))
+            .or_else(|| {
+                (lo..=max_k)
+                    .rev()
+                    .find_map(|k| fits(k).filter(|_| structural(&keys[..keys.len() - k])).map(|r| (k, r)))
+            });
+        let Some((k, reading)) = choice else { return false };
+        let mut raw = keys[keys.len() - k..].to_vec();
+        raw.push(tone);
+        let from_groups = k - held;
+        self.pending.clear();
+        self.groups.drain(self.cursor - from_groups..self.cursor);
+        self.cursor -= from_groups;
+        self.insert_syllable(reading, raw);
+        true
     }
 
     /// Cursor sits in a path or URL token (`~/`, `./`, `../`, or `://`), counting

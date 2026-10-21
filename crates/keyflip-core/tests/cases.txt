@@ -49,6 +49,15 @@ B03	su3cl3Hsiang_su3cl3<E>	你好Hsiang 你好
 R01	ai<T><E>	ai
 R02	su3cl3<L><B><E>	好
 
+# --- Chinese right after an English word, no Space (MI-23) ---
+G01	entercjo41u04t/6<E>	enter會變成
+G02	su3cl3Hsiangcl3<E>	你好Hsiang好
+G03	githubji3<E>	github我
+G04	form4<E>	form4
+G05	item3<E>	item3
+G06	user2024<E>	user2024
+G07	entercjo4<T><E>	entercjo4
+
 # --- identifier protection (MI-20, MI-21) ---
 I01	my<S-->ai_su3<E>	my_ai 你
 I02	a@su3.com<E>	a@su3.com

@@ -39,6 +39,14 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 - MI-6 No automatic space between adjacent English and Chinese by default; a setting adds
   one.
 
+- MI-23 Chinese may follow an English word with no Space. When a tone key (3, 4, 6, 7)
+  arrives inside an English word, the last one to four keys of the word plus the tone
+  become a Zhuyin syllable if all hold: they form a legal syllable; what remains of the
+  word is a common English word (rank under 10,000), starts with a Shift-typed capital,
+  or is three or more letters that cannot be Zhuyin (`github`); and the whole run before the tone is not itself a common English word
+  (`form4`, `item3` stay as typed). The longest such tail wins. First-tone syllables
+  still need a Space before them, because Space also ends an English word.
+
 ### Recovery
 
 - MI-7 Enter while composing commits the composition as shown and does nothing else.

@@ -119,10 +119,23 @@ A judgment can always be changed:
   approach, which misread `user.name` as a URL. The snapshot does not yet expose protected
   ranges; no shell needs them.
 
+## Splitting Chinese off an English word (MI-23)
+
+The split is decided only when a tone key arrives, because that is the first moment
+the tail is known to be a whole syllable. Candidates are tails of one to four keys,
+including keys still pending (`, ; /` are pending Zhuyin keys that would otherwise break
+the word). Two passes pick the tail: first the shortest tail whose head is a listed
+English word, so `years` + 一 keeps `years` rather than `year` + 泥; then the longest tail
+whose head starts with a Shift capital or cannot be Zhuyin, so `Hsiang` + 好 keeps
+`Hsiang`. A run that is itself a listed word never splits, which protects `form4` and
+`item3`. Measured by `keyflip-cli eval`: glued sentences and English-plus-digit tokens.
+
 ## Known limits (first version)
 
-- Chinese right after an English word needs a Space first to end the English word. Automatic
-  splitting comes later.
+- Chinese right after an English word splits on the tone key (MI-23). A first-tone
+  syllable there still needs a Space first, because Space also ends the English word.
+  When the word plus an inflection is also a word (`list` + ㄋ… versus `lists`), the
+  longer word wins; Tab undoes a wrong split.
 - Two-letter abbreviations (such as `jp`, `ai`) default to Chinese; recover with Enter or Tab.
 - Only the standard Zhuyin layout.
 

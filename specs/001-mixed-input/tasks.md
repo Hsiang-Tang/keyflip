@@ -20,6 +20,9 @@ Format: task, requirements covered, verification, status.
   a protocol compatibility test, and a rendered screenshot of the macOS grid. Status: done
   in the engine and the macOS shell (2026-10-21); the Windows candidate window still draws
   the page that holds the selection, not the full grid.
+- T-MI-9 Chinese right after an English word with no Space. Requirement MI-23.
+  Verification: cases G01 to G07 and the eval lines "Glued" and "English + digit".
+  Status: done (2026-10-21).
 - T-MI-7 Tab prediction (version 2). Status: not started.
 
 Rule: never delete or loosen a case to make an implementation pass. New behavior gets a

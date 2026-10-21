@@ -147,6 +147,65 @@ fn eval() {
         println!("  wrong: {b}");
     }
 
+    // Glued: Chinese phrase, English word, Chinese phrase, no space (MI-23).
+    let mut bad = Vec::new();
+    let mut n = 0usize;
+    for (i, w) in words.iter().enumerate() {
+        let a = phrases[(i * 7) % phrases.len()];
+        let b = phrases[(i * 13 + 5) % phrases.len()];
+        let ka = a.readings.iter().map(|r| keys_of_reading(r)).collect::<Option<Vec<_>>>();
+        let kb = b.readings.iter().map(|r| keys_of_reading(r)).collect::<Option<Vec<_>>>();
+        let (Some(ka), Some(kb)) = (ka, kb) else { continue };
+        let kb = kb.concat();
+        // A first-tone syllable ends with Space, which ends the word anyway; skip those.
+        if kb.contains('_') {
+            continue;
+        }
+        let out = run(&mut engine, &format!("{}{}{}<E>", ka.concat(), w, kb));
+        n += 1;
+        let tail = out.split_once(*w).map(|(_, t)| t).unwrap_or("x");
+        if tail.is_empty() || tail.chars().any(|c| c.is_ascii()) {
+            bad.push(format!("{}+{w}+{} -> {out}", a.text, b.text));
+        }
+    }
+    println!(
+        "Glued zh+en+zh: {n} sentences, {} wrong ({:.1}%)",
+        bad.len(),
+        100.0 * bad.len() as f64 / n.max(1) as f64
+    );
+    for b in bad.iter().take(15) {
+        println!("  wrong: {b}");
+    }
+
+    // English words and identifiers followed by a tone digit must stay as typed.
+    let mut tokens: Vec<String> = [
+        "user2024", "mp3", "mp4", "web3", "h264", "gpt4", "win7", "ipv4", "x86", "es6",
+        "form4", "item3", "room4", "html5", "css3", "python3", "v1.3.4", "page3", "level4",
+        "step6", "top7", "ios17", "m4a", "p2p", "b2b",
+    ]
+    .iter()
+    .map(|t| t.to_string())
+    .collect();
+    for (i, w) in words_all.iter().skip(100).take(2900).enumerate() {
+        tokens.push(format!("{w}{}", ['3', '4', '6', '7'][i % 4]));
+    }
+    let bad: Vec<String> = tokens
+        .iter()
+        .filter_map(|t| {
+            let out = run(&mut engine, &format!("{t}<E>"));
+            (out != *t).then(|| format!("{t}->{out}"))
+        })
+        .collect();
+    println!(
+        "English + digit: {} tokens, {} changed ({:.1}%)",
+        tokens.len(),
+        bad.len(),
+        100.0 * bad.len() as f64 / tokens.len() as f64
+    );
+    for b in bad.iter().take(15) {
+        println!("  wrong: {b}");
+    }
+
     // English: common words typed lowercase and closed with a space.
     let words = eng.words_by_rank();
     for (lo, hi) in [(0usize, 300usize), (300, 1000), (1000, 3000), (3000, 10000)] {
