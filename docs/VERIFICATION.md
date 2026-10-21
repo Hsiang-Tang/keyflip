@@ -133,6 +133,17 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   written first; R03 and R05 failed before the change.
 - `cargo test --workspace` passes (50 cases); evaluation output identical.
 
+### 2026-10-21 English completion with Tab (003-tab-prediction)
+
+- Four behavior tests written first (suggestion after the cursor, Tab accepts and Enter
+  never commits it, the suggestion follows the prefix, none for short words, Chinese,
+  paths, identifiers, capitals, or a cursor inside the text); they did not compile
+  before the change. `cargo test --workspace` passes.
+- Evaluation output is identical: the suggestion never reaches committed text.
+- Samples: `conf` suggests `erence`, `envi` `ronment`, `impl` `ement`, `docu` `ment`
+  (the shorter base wins over the more frequent `documents`).
+- macOS build installed; dimmed drawing not yet seen in real hosts.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

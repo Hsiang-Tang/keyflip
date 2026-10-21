@@ -275,3 +275,41 @@ fn left_in_the_compact_list_still_closes_and_moves_the_cursor() {
     let snap = feed(&mut e, "<L>");
     assert!(snap.candidates.is_none());
 }
+
+fn suggestion(snap: &Snapshot) -> Option<String> {
+    snap.preedit
+        .iter()
+        .find(|s| s.kind == keyflip_core::SegKind::Suggestion)
+        .map(|s| s.text.clone())
+}
+
+#[test]
+fn english_prefix_shows_a_completion_after_the_cursor() {
+    let mut e = engine();
+    let snap = feed(&mut e, "docu");
+    assert_eq!(suggestion(&snap).as_deref(), Some("ment"));
+    assert_eq!(snap.cursor, 4, "the cursor stays before the suggestion");
+}
+
+#[test]
+fn tab_accepts_the_completion_and_enter_never_commits_it() {
+    assert_eq!(commit_of("docu<T><E>"), "document");
+    assert_eq!(commit_of("docu<E>"), "docu");
+    assert_eq!(commit_of("docu<T>s<E>"), "documents");
+}
+
+#[test]
+fn the_completion_follows_the_prefix() {
+    let mut e = engine();
+    feed(&mut e, "envi");
+    assert_eq!(suggestion(&feed(&mut e, "r")).as_deref(), Some("onment"));
+}
+
+#[test]
+fn no_completion_for_short_words_chinese_paths_or_identifiers() {
+    for keys in ["ai", "su3cl3", "~/doc", "my<S-->docu", "Docu", "docu<L>"] {
+        let mut e = engine();
+        assert_eq!(suggestion(&feed(&mut e, keys)), None, "{keys}");
+    }
+    assert_eq!(commit_of("ai<T><E>"), "ai", "Tab still flips without a suggestion");
+}

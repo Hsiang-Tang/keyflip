@@ -1,8 +1,8 @@
 # Specification: Tab prediction (003-tab-prediction)
 
-Status: decisions made 2026-10-21 (both kinds; Chinese continuation accepted with Right
-at the end of the composition). Not implemented; paused by the maintainer before
-implementation. Next: write acceptance cases, then plan and tasks. Roadmap item 9.
+Status: implemented 2026-10-21 (English word completion with Tab only); macOS hand
+test pending. Chinese
+continuation (associated phrases) is out of scope; see "Not doing". Roadmap item 9.
 
 ## Goal
 
@@ -23,27 +23,22 @@ of three or more letters have no such conflict: they are judged English by struc
 and the short ambiguous words that Tab exists for (`ai`, `up`) are too short to
 suggest anything.
 
-## Kinds of prediction
+## Scope
 
-- English word completion: after three or more letters of an English word, suggest the
-  most common listed word (rank under 10,000) that extends the prefix by at least two
-  letters. Source: `data/english.txt`, already bundled.
-- Chinese continuation (associated phrases): after a Chinese character, suggest the
-  most frequent lexicon phrase that starts with the last one or two characters (after
-  我愛, suggest 你 from 我愛你 if such a phrase exists; after 電, suggest 腦). Source:
-  `data/lexicon.tsv`, already bundled.
+English word completion: after three or more letters of an English word, suggest the
+most common listed word (rank under 10,000) that extends the prefix by at least two
+letters. Source: `data/english.txt`, already bundled.
 
-## Decisions
+## Not doing
 
-- **Scope**: English completion only first (recommended: no key conflict, smallest
-  change, and real use shows whether Chinese continuation is wanted), or both kinds
-  together.
-- **Chinese accept key** (only if Chinese continuation is in scope): Right at the end
-  of the composition (recommended: the key is free there, and shells such as fish use
-  it for suggestions), or Tab, accepting that a syllable can then only be flipped back
-  when no suggestion is showing.
+Chinese continuation (associated phrases, such as 腦 after 電) was considered and
+dropped on 2026-10-21. Reasons: it is outside the Chinese/English switching problem
+(constitution principle 7); without typing history the lexicon can only guess by
+frequency, so it guesses wrong often; a wrong guess after every character is visual
+noise; and Tab cannot accept it without hiding the flip of the last syllable. Reopen
+only if daily use shows a real need.
 
-## Draft requirements
+## Requirements
 
 - TP-1 A suggestion is shown only when the cursor is at the end of the composition and
   no candidate window is open. It is drawn as a separate preedit segment of kind
@@ -56,12 +51,15 @@ suggest anything.
   through a suggestion behaves as if it were not there.
 - TP-5 English completion: prefix of three or more lowercase letters inside an English
   word, the word itself not finished by Space; the suggestion is the remainder of the
-  best-ranked listed word with the prefix, at least two letters long.
+  best-ranked listed word with the prefix, at least two letters long. When a shorter
+  listed word with the prefix is a prefix of that word, the shorter one is used
+  (`document`, not the more frequent `documents`); the word continues after Tab, so a
+  plural is one more key.
 - TP-6 No suggestion inside a path, URL, or identifier token (MI-20, MI-21).
 - TP-7 No learning, no history, no disk or network access. A user lexicon remains a
   separate roadmap item (10) with its own decision record.
 
-## Draft acceptance cases
+## Acceptance cases
 
 - `docu` shows suggestion `ment`; Tab, Enter commits `document`.
 - `docu`, Enter commits `docu` (the suggestion is not committed).
@@ -76,8 +74,8 @@ suggest anything.
 - macOS: draw the `suggestion` segment dimmed. Marked text styling is decided by the
   host application and some hosts ignore colors, so the panel may need to show the
   suggestion instead; to be checked in the hand test.
-- Windows: the TSF display attribute for the segment; unverified until a machine with
-  administrator rights exists.
+- Windows: the segment is drawn like other composition text (underlined, not dimmed);
+  unverified until a machine with administrator rights exists.
 - Older shells that do not know the segment kind would show it as normal text; the
   engine and shells ship together, so this is acceptable.
 
@@ -85,7 +83,3 @@ suggest anything.
 
 - Code editors accept inline suggestions with Tab only while one is visible; otherwise
   Tab keeps its normal meaning. keyflip adopts that rule (TP-2).
-- Command shells with autosuggestions accept with Right at the end of the line, which
-  is why Right is the recommended key for Chinese continuation.
-- Microsoft New Zhuyin can offer associated phrases after a commit. keyflip keeps them
-  inside the composition instead, so committing never pops up a second list.

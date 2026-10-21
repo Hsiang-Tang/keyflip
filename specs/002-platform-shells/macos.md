@@ -92,6 +92,8 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 - [ ] `github`, `docker`, `npm install` appear as English with no switching.
 - [ ] `Hsiang`, Space, then `su3cl3` composes "Hsiang" followed by the Chinese for "hello".
 - [ ] `j9s` (ㄨㄞㄋ) then Tab then Enter gives ㄨㄞㄋ.
+- [ ] `docu` shows a dimmed `ment`; Tab completes `document`; Enter without Tab gives
+      `docu`. Note any app where the suggestion looks like normal text.
 - [ ] `1` then Enter gives ㄅ; `ai` then Tab then Enter gives `ai`; `ai` then Space
       (Chinese appears) then Tab gives `ai `.
 - [ ] Enter while composing only confirms the text, with no newline or send; a second Enter

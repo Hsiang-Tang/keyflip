@@ -27,8 +27,8 @@ Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
 ## Version 2
 
 9. Tab prediction (accept a suggestion, like VS Code). Draft design:
-   `specs/003-tab-prediction/spec.md`; scope decided (English completion with Tab, Chinese
-   continuation with Right), implementation not started.
+   `specs/003-tab-prediction/`; English completion done 2026-10-21, Chinese associated
+   phrases dropped.
 10. User lexicon and learning (candidate memory); must be inspectable, deletable, and
     recoverable after corruption (TronIn's approach).
 11. Signing and notarization (macOS) and installer signing (Windows), only needed for

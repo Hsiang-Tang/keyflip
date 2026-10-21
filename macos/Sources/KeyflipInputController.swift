@@ -101,6 +101,14 @@ final class KeyflipInputController: IMKInputController {
     private func markedText(for segments: [EngineSegment]) -> NSAttributedString {
         let result = NSMutableAttributedString()
         for segment in segments {
+            if segment.kind == "suggestion" {
+                // A completion Tab would accept: dimmed and not underlined. Hosts
+                // that ignore marked text colors show it like typed text.
+                result.append(NSAttributedString(string: segment.text, attributes: [
+                    .foregroundColor: NSColor.tertiaryLabelColor,
+                ]))
+                continue
+            }
             let style: NSUnderlineStyle = segment.kind == "selected" ? .thick : .single
             result.append(NSAttributedString(string: segment.text, attributes: [
                 .underlineStyle: style.rawValue,

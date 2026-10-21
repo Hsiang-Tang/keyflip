@@ -3,7 +3,7 @@ import Foundation
 /// What the engine reports after a request (mirrors keyflip-proto's `state`).
 struct EngineSegment {
     let text: String
-    /// "chinese", "latin", "pending" or "selected".
+    /// "chinese", "latin", "pending", "selected" or "suggestion".
     let kind: String
 }
 

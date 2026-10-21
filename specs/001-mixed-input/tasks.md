@@ -25,7 +25,8 @@ Format: task, requirements covered, verification, status.
   Status: done (2026-10-21).
 - T-MI-10 Zhuyin abbreviations with Tab. Requirement MI-24. Verification: cases R03 to
   R07. Status: done (2026-10-21).
-- T-MI-7 Tab prediction (version 2). Status: not started.
+- T-MI-7 Tab prediction. Moved to `specs/003-tab-prediction/`; English completion done
+  (2026-10-21).
 
 Rule: never delete or loosen a case to make an implementation pass. New behavior gets a
 case before code.

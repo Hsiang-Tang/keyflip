@@ -8,6 +8,8 @@ pub enum SegKind {
     Pending,
     /// The unit the candidate window or cursor currently targets.
     Selected,
+    /// Dimmed completion after the cursor; Tab accepts it, nothing commits it.
+    Suggestion,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

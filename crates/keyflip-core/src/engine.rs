@@ -198,6 +198,12 @@ impl Engine {
                 if !self.is_composing() {
                     return false;
                 }
+                if let Some(rest) = self.suggestion() {
+                    for c in rest.chars() {
+                        self.insert(Group::latin(c));
+                    }
+                    return true;
+                }
                 if !self.pending.is_empty() {
                     self.pending_to_latin();
                 } else {
@@ -661,6 +667,23 @@ impl Engine {
         }
     }
 
+    /// TP-5: completion for the lowercase English word ending at the cursor.
+    fn suggestion(&self) -> Option<String> {
+        if self.window.is_some() || !self.pending.is_empty() || self.cursor != self.groups.len() {
+            return None;
+        }
+        let mut start = self.cursor;
+        while start > 0 && matches!(self.groups[start - 1].kind, Kind::Latin) && self.groups[start - 1].ch.is_ascii_lowercase() {
+            start -= 1;
+        }
+        let prefix: String = self.groups[start..].iter().map(|g| g.ch).collect();
+        let glued = start > 0 && !self.groups[start - 1].is_syllable() && self.groups[start - 1].ch != ' ';
+        if prefix.len() < 3 || glued {
+            return None;
+        }
+        self.eng.complete(&prefix, WORD_RANK_CUTOFF as usize).map(str::to_owned)
+    }
+
     /// MI-24: show the trailing run of zhuyin-key letters as zhuyin symbols.
     fn flip_to_symbols(&mut self) {
         if self.cursor != self.groups.len() {
@@ -916,6 +939,12 @@ impl Engine {
         if self.cursor >= texts.len() {
             push_pending(&mut preedit);
             cursor16 = preedit.iter().map(|s| s.text.encode_utf16().count()).sum();
+        }
+        if let Some(rest) = self.suggestion() {
+            preedit.push(Segment {
+                text: rest,
+                kind: SegKind::Suggestion,
+            });
         }
         let candidates = self.window.as_ref().map(|w| Candidates {
             items: w.cands.iter().map(|c| c.text.clone()).collect(),

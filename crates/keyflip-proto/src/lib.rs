@@ -64,7 +64,7 @@ pub enum Request {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WireSegment {
     pub text: String,
-    /// `chinese`, `latin`, `pending` or `selected`.
+    /// `chinese`, `latin`, `pending`, `selected` or `suggestion`.
     pub kind: String,
 }
 
@@ -145,6 +145,7 @@ fn state_of(s: Snapshot) -> Response {
             SegKind::Latin => "latin",
             SegKind::Pending => "pending",
             SegKind::Selected => "selected",
+            SegKind::Suggestion => "suggestion",
         }
         .to_owned()
     };
