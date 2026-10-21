@@ -26,7 +26,8 @@ Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
 
 ## Version 2
 
-9. Tab prediction (accept a suggestion, like VS Code).
+9. Tab prediction (accept a suggestion, like VS Code). Draft design:
+   `specs/003-tab-prediction/spec.md`, waiting for the maintainer's choices.
 10. User lexicon and learning (candidate memory); must be inspectable, deletable, and
     recoverable after corruption (TronIn's approach).
 11. Signing and notarization (macOS) and installer signing (Windows), only needed for
