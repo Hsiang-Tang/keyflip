@@ -17,5 +17,7 @@
   (2026-10-21, Apple Silicon).
 - T-PS-7 macOS real typing. Requirements PS-2 to PS-9. Verification: manual checklist in
   `macos.md`. Status: in progress; installed, waiting for hand testing.
-- T-PS-8 macOS icon and multiple modes. Status: not started.
+- T-PS-8 macOS icon and multiple modes. Status: icon done (2026-10-21, vector template
+  PDF, rendered and inspected; menu bar appearance waits for the hand test); multiple
+  modes not started.
 - T-PS-9 Settings UI (Chinese/English spacing, full-width default). Status: not started.

@@ -13,7 +13,8 @@ Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
 ## Next
 
 4. Settings UI: space between Chinese and English (off by default), full-width default.
-5. Input method icon and menu name (the macOS icon is blank today).
+5. Input method icon: done 2026-10-21 on macOS (vector template `MenuIcon.pdf`, drawn
+   by `macos/make-icon.swift`). Windows still has no icon.
 6. Identifier protection: joiners and punctuation width done 2026-10-21 (MI-20, MI-21).
    Remaining: output protected ranges in the snapshot once a shell needs them.
 7. Windows: run `installer/install.ps1` on a machine with administrator rights and

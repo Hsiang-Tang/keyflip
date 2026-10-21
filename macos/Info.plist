@@ -32,6 +32,10 @@
     <string>KeyflipInputController</string>
     <key>TISInputSourceID</key>
     <string>com.hsiangtang.inputmethod.keyflip</string>
+    <key>tsInputMethodIconFileKey</key>
+    <string>MenuIcon.pdf</string>
+    <key>TISIconIsTemplate</key>
+    <true/>
     <key>tsInputMethodCharacterRepertoireKey</key>
     <array>
         <string>Hant</string>
@@ -45,6 +49,14 @@
             <dict>
                 <key>TISInputSourceID</key>
                 <string>com.hsiangtang.inputmethod.keyflip.Zhuyin</string>
+                <key>TISIconIsTemplate</key>
+                <true/>
+                <key>tsInputModeMenuIconFileKey</key>
+                <string>MenuIcon.pdf</string>
+                <key>tsInputModeAlternateMenuIconFileKey</key>
+                <string>MenuIcon.pdf</string>
+                <key>tsInputModePaletteIconFileKey</key>
+                <string>MenuIcon.pdf</string>
                 <key>TISIntendedLanguage</key>
                 <string>zh-Hant</string>
                 <key>tsInputModeCharacterRepertoireKey</key>

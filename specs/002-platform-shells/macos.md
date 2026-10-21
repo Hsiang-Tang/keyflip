@@ -114,7 +114,9 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 
 ## Known limits
 
-- There is only one input mode and no icon; the menu icon is blank.
+- There is only one input mode. The menu icon is a vector template (`MenuIcon.pdf`,
+  regenerate with `macos/make-icon.swift`); macOS caches input source icons, so a changed
+  icon may only appear after logging out and back in.
 - The candidate window is a simple floating window with no page indicator.
 - Chinese right after an English word needs a Space first.
 - Only the standard Zhuyin layout is supported.
