@@ -83,6 +83,8 @@ struct Flip {
     start: usize,
     end: usize,
     was_syllable: bool,
+    /// The run is shown as zhuyin symbols (MI-24); Tab restores the letters.
+    symbols: bool,
     raw: Vec<char>,
 }
 
@@ -428,6 +430,7 @@ impl Engine {
                     start,
                     end: self.cursor,
                     was_syllable: false,
+                    symbols: false,
                     raw: full,
                 });
             }
@@ -449,6 +452,7 @@ impl Engine {
             start,
             end: self.cursor,
             was_syllable: true,
+            symbols: false,
             raw,
         });
     }
@@ -611,11 +615,21 @@ impl Engine {
 
     /// Tab: swap the last automatic decision between zhuyin and English.
     fn flip_last(&mut self) {
-        let Some(f) = self.flip.clone() else { return };
+        let Some(f) = self.flip.clone() else {
+            self.flip_to_symbols();
+            return;
+        };
         if f.end != self.groups.len() || self.cursor != self.groups.len() {
             return;
         }
-        if f.was_syllable {
+        if f.symbols {
+            self.groups.truncate(f.start);
+            self.cursor = f.start;
+            for &c in &f.raw {
+                self.insert(Group::latin(c));
+            }
+            self.flip = None;
+        } else if f.was_syllable {
             self.groups.truncate(f.start);
             self.cursor = f.start;
             for &c in &f.raw {
@@ -625,6 +639,7 @@ impl Engine {
                 start: f.start,
                 end: self.cursor,
                 was_syllable: false,
+                symbols: false,
                 raw: f.raw,
             });
         } else {
@@ -644,6 +659,37 @@ impl Engine {
             self.cursor = f.start;
             self.insert_syllable(reading, f.raw);
         }
+    }
+
+    /// MI-24: show the trailing run of zhuyin-key letters as zhuyin symbols.
+    fn flip_to_symbols(&mut self) {
+        if self.cursor != self.groups.len() {
+            return;
+        }
+        let is_key = |g: &Group| {
+            matches!(g.kind, Kind::Latin) && !g.ch.is_ascii_uppercase() && zhuyin::symbol_of_key(g.ch).is_some()
+        };
+        let mut start = self.cursor;
+        while start > 0 && is_key(&self.groups[start - 1]) {
+            start -= 1;
+        }
+        let joined = start > 0 && matches!(self.groups[start - 1].kind, Kind::Latin) && is_word_char(self.groups[start - 1].ch);
+        if start == self.cursor || joined {
+            return;
+        }
+        let raw: Vec<char> = self.groups[start..].iter().map(|g| g.ch).collect();
+        self.groups.truncate(start);
+        self.cursor = start;
+        for &c in &raw {
+            self.insert(Group::latin(zhuyin::symbol_of_key(c).expect("zhuyin key")));
+        }
+        self.flip = Some(Flip {
+            start,
+            end: self.cursor,
+            was_syllable: false,
+            symbols: true,
+            raw,
+        });
     }
 
     // ---- candidate window ----

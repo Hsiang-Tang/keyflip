@@ -48,6 +48,11 @@ B03	su3cl3Hsiang_su3cl3<E>	你好Hsiang 你好
 # --- recovery ---
 R01	ai<T><E>	ai
 R02	su3cl3<L><B><E>	好
+R03	j9s<T><E>	ㄨㄞㄋ
+R04	j9s<T><T><E>	j9s
+R05	su3cl3j9s<T><E>	你好ㄨㄞㄋ
+R06	j9s<E>	j9s
+R07	Hsiang<T><E>	Hsiang
 
 # --- Chinese right after an English word, no Space (MI-23) ---
 G01	entercjo41u04t/6<E>	enter會變成

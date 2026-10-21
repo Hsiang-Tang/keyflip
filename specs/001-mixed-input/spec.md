@@ -56,6 +56,11 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
   combos, focus loss) follows the same rule. Changed 2026-10-21 at the maintainer's
   request: before, Enter committed raw letters, so a shown ㄅ became `1`.
 - MI-8 Tab flips the most recent automatic judgment: Zhuyin to English or English to Zhuyin.
+- MI-24 Zhuyin abbreviations (注音文, such as ㄨㄞㄋ for "I love you"). Tab on an
+  English run whose keys are all Zhuyin keys, when no other judgment is waiting to be
+  flipped, shows the run as Zhuyin symbols; Enter then commits the symbols, and Tab again
+  restores the letters. The run is never turned into symbols automatically, because
+  `x86` or `h264` look the same.
 - MI-9 Backspace deletes one unit; after deleting an English letter the remaining key
   sequence is judged again.
 

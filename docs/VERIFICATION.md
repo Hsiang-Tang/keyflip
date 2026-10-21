@@ -126,6 +126,13 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   one is lowercase `gpt4`, accepted because Tab recovers it.
 - All other evaluation lines are unchanged. `cargo test --workspace` passes (45 cases).
 
+### 2026-10-21 Zhuyin abbreviations (MI-24)
+
+- Maintainer report: ㄨㄞㄋ came out as `j9s`. Automatic detection was rejected because
+  identifiers such as `x86` share the shape; Tab converts instead. Cases R03 to R07
+  written first; R03 and R05 failed before the change.
+- `cargo test --workspace` passes (50 cases); evaluation output identical.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

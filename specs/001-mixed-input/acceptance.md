@@ -51,6 +51,8 @@ Recovery cases
 - Enter mid-typing commits what is shown: `ai<E>` is ㄇㄛ and `1<E>` is ㄅ; Tab first
   gives the raw letters (`ai<T><E>` is `ai`).
 - Tab flips the judgment back and forth between Chinese and English.
+- Zhuyin abbreviations: `j9s` is judged English; Tab shows ㄨㄞㄋ and Enter commits it;
+  Tab again restores `j9s`. A Shift-started word is never partly converted.
 - Shift+Enter and Ctrl/Alt/Win combos: the first press only confirms the text while
   composing; the second passes through to the application.
 
