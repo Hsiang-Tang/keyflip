@@ -12,7 +12,7 @@ Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
 
 ## Next
 
-4. Settings UI: space between Chinese and English (off by default), full-width default.
+4. Settings UI: dropped 2026-10-21 (see "Explicitly not doing").
 5. Input method icon: done 2026-10-21 on macOS (vector template `MenuIcon.pdf`, drawn
    by `macos/make-icon.swift`). Windows still has no icon.
 6. Identifier protection: joiners and punctuation width done 2026-10-21 (MI-20, MI-21).
@@ -38,4 +38,9 @@ Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
 
 - Single-tap modifier gestures (ADR-0002).
 - Fast-typing error correction.
+- Settings UI (2026-10-21, maintainer). Space between Chinese and English: not wanted,
+  a Space typed by hand is enough. Full-width punctuation: rarely used; Shift+Space
+  per application is enough, so the state is not remembered either. Windows keeps its
+  `config.json` for spacing. Revisit when a real setting is needed (for example the
+  user lexicon, item 10).
 - Support for users who do not type tones.
