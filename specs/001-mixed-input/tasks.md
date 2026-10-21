@@ -28,6 +28,9 @@ Format: task, requirements covered, verification, status.
 - T-MI-11 CapsLock light means uppercase letters. Requirement MI-25, ADR-0006.
   Verification: cases K01 to K04, protocol and Windows key-map tests. Status: done
   (2026-10-21) in the engine and macOS shell; Windows reads the light, unverified.
+- T-MI-12 Common characters before rare ones on a frequency tie. Requirement MI-10.
+  Verification: behavior test `rare_characters_never_outrank_common_ones_on_a_frequency_tie`
+  and builder tests. Status: done (2026-10-21).
 - T-MI-7 Tab prediction. Moved to `specs/003-tab-prediction/`; English completion done
   (2026-10-21).
 

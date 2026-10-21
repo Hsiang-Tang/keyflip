@@ -9,6 +9,9 @@ pub struct Entry {
     pub readings: Vec<String>,
     pub text: String,
     pub count: u32,
+    /// Outside the Big5 set (rare, simplified, or extension character). Breaks
+    /// count ties so common characters come first (MI-10).
+    pub rare: bool,
 }
 
 #[derive(Debug, Default)]
@@ -34,7 +37,8 @@ impl Lexicon {
         Lexicon::from_tsv(include_str!("../../../data/lexicon.tsv"))
     }
 
-    /// Parse `readings<TAB>text<TAB>count` lines. Malformed lines are skipped.
+    /// Parse `readings<TAB>text<TAB>count[<TAB>rare]` lines, where `rare` is 1 for
+    /// a non-Big5 character and defaults to 0. Malformed lines are skipped.
     pub fn from_tsv(tsv: &str) -> Lexicon {
         let mut lex = Lexicon::default();
         let mut total = 0f64;
@@ -48,6 +52,7 @@ impl Lexicon {
             let Ok(count) = count.trim().parse::<u32>() else {
                 continue;
             };
+            let rare = parts.next().is_some_and(|r| r.trim() == "1");
             let readings: Vec<String> = readings.split(' ').map(str::to_owned).collect();
             if readings.is_empty() || text.chars().count() != readings.len() {
                 continue;
@@ -69,10 +74,16 @@ impl Lexicon {
                     readings,
                     text: text.to_owned(),
                     count,
+                    rare,
                 });
         }
         for entries in lex.by_first.values_mut() {
-            entries.sort_by(|a, b| b.count.cmp(&a.count).then_with(|| a.text.cmp(&b.text)));
+            entries.sort_by(|a, b| {
+                b.count
+                    .cmp(&a.count)
+                    .then_with(|| a.rare.cmp(&b.rare))
+                    .then_with(|| a.text.cmp(&b.text))
+            });
         }
         lex.total = total.max(1.0);
         lex

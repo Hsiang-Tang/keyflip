@@ -179,6 +179,25 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   reported, and a new test checks the toggle bit, not the down bit, is read.
 - `cargo test --workspace` passes; evaluation output identical.
 
+### 2026-10-21 Common characters before rare ones (MI-10)
+
+- Maintainer report: very rare characters showed early in the candidate list. Cause:
+  uncounted characters were ordered by code point, so extension-A characters (U+3400)
+  came before common ones (U+4E00). 384 of 1,396 single-syllable readings had a rare
+  character on page 1 while a common character was pushed to a later page.
+- Fix: the builder keeps upstream's class column (`big5` or `utf8`) as a fourth
+  `lexicon.tsv` column (1 = non-Big5); the engine breaks count ties with it.
+- The behavior test failed before the change (㧊 at 6, 犮 at 14) and passes after. The
+  first draft of the test used 坺, which upstream also marks `utf8`, so it still failed
+  after the change; it was corrected to 犮, a Big5 character. The recorded failing run
+  shows 犮 at 14 under the old order, so the corrected test also fails before the
+  change and is not looser.
+- Rebuilt from the same pinned sources (all four sha256 values match `SOURCES.txt`);
+  the first three columns are byte-identical to the previous file. 12,149 entries are
+  marked rare. After the change 1 reading remains (ㄎㄨㄤˋ: 鑛 has count 1, so frequency
+  correctly wins).
+- `cargo test --workspace` and the builder tests pass; evaluation output identical.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

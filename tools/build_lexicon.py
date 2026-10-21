@@ -48,7 +48,11 @@ def parse_occ(text):
 
 
 def parse_base(text, stats):
-    """BPMFBase.txt -> list of (char, reading). Symbol entries are skipped."""
+    """BPMFBase.txt -> list of (char, reading, common). Symbol entries are skipped.
+
+    `common` is True unless the line's class column says `utf8`: upstream marks
+    characters in the Big5 set `big5` and rare, simplified, or extension
+    characters `utf8`. A line without the column counts as common."""
     out = []
     for line in text.splitlines():
         parts = line.split()
@@ -63,7 +67,7 @@ def parse_base(text, stats):
         if not READING_RE.match(parts[1]):
             stats["base_bad_reading"] += 1
             continue
-        out.append((parts[0], parts[1]))
+        out.append((parts[0], parts[1], parts[-1] != "utf8"))
     return out
 
 
@@ -97,11 +101,16 @@ def build_tables(src):
     stats = new_stats()
     occ = parse_occ(read_text(os.path.join(src, "phrase.occ")))
     entries = {}
-    for ch, rd in parse_base(read_text(os.path.join(src, "BPMFBase.txt")), stats):
-        entries[(rd, ch)] = occ.get(ch, 0)
+    # Value: (count, rare). rare is 1 for a non-Big5 character, else 0.
+    for ch, rd, common in parse_base(read_text(os.path.join(src, "BPMFBase.txt")), stats):
+        rare = 0 if common else 1
+        if (rd, ch) in entries:
+            rare = min(rare, entries[(rd, ch)][1])
+        entries[(rd, ch)] = (occ.get(ch, 0), rare)
     for phrase, rds in parse_mappings(read_text(os.path.join(src, "BPMFMappings.txt")), stats):
-        entries[(" ".join(rds), phrase)] = occ.get(phrase, 0)
-    lex = "".join("%s\t%s\t%d\n" % (rd, tx, n) for (rd, tx), n in sorted(entries.items()))
+        entries[(" ".join(rds), phrase)] = (occ.get(phrase, 0), 0)
+    lex = "".join("%s\t%s\t%d\t%d\n" % (rd, tx, n, r)
+                  for (rd, tx), (n, r) in sorted(entries.items()))
     return lex, stats
 
 

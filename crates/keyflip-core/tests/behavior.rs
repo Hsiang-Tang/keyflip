@@ -313,3 +313,15 @@ fn no_completion_for_short_words_chinese_paths_or_identifiers() {
     }
     assert_eq!(commit_of("ai<T><E>"), "ai", "Tab still flips without a suggestion");
 }
+
+#[test]
+fn rare_characters_never_outrank_common_ones_on_a_frequency_tie() {
+    // ㄅㄚˊ: 犮 (Big5) and 㧊 (extension A) both have count 0; 犮 must come first,
+    // and every listed Big5 character fits on the first page.
+    let mut e = engine();
+    let items = feed(&mut e, "186<D>").candidates.expect("window").items;
+    let pos = |c: &str| items.iter().position(|i| i == c);
+    let (common, rare) = (pos("犮").expect("犮 listed"), pos("㧊").expect("㧊 listed"));
+    assert!(common < 9, "犮 on page 1: {items:?}");
+    assert!(common < rare, "坺 at {common}, 㧊 at {rare}: {items:?}");
+}

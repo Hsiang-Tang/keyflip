@@ -72,7 +72,10 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 ### Candidate selection
 
 - MI-10 The candidate list shows words first, then single characters, nine per page,
-  selected by digit.
+  selected by digit. Within each group the most frequent comes first; among equal
+  frequencies, characters in the Big5 set (common traditional characters) come before
+  rare, simplified, or extension characters, so ㄅㄚˊ never shows 㧊 before 犮. The same
+  order decides the default conversion when frequencies tie.
 - MI-11 Left selects the previous character and Down opens candidates, as in New Zhuyin.
 - MI-12 Esc closes the candidate window first; only without one does it clear the
   composition.

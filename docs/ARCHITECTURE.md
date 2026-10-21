@@ -20,7 +20,7 @@
 - `crates/keyflip-ffi`: C interface static library for macOS.
 - `macos/`: Swift IMK shell (thin).
 - `crates/keyflip-cli`: `play` simulator and `eval` evaluator.
-- `data/`: `lexicon.tsv` (5.8 MB, derived from McBopomofo), `english.txt`,
+- `data/`: `lexicon.tsv` (6.1 MB, derived from McBopomofo), `english.txt`,
   `SOURCES.txt` and `ENGLISH_SOURCE.txt` (pinned upstream versions).
 - `tools/`: `build_lexicon.py`, `build_english.py`, `build-windows.sh`.
 

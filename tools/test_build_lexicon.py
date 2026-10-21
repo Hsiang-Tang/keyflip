@@ -14,8 +14,10 @@ class ParserTests(unittest.TestCase):
 
     def test_base(self):
         st = b.new_stats()
-        text = "ㄝ ㄝ e , big5\n誒 ㄝˋ e4 ,4 big5\n你 ㄋㄧˇ n i3\n壞 abc x y z\n單\n\n"
-        self.assertEqual(b.parse_base(text, st), [("誒", "ㄝˋ"), ("你", "ㄋㄧˇ")])
+        text = ("ㄝ ㄝ e , big5\n誒 ㄝˋ e4 ,4 big5\n你 ㄋㄧˇ n i3\n壞 abc x y z\n單\n"
+                "㧊 ㄅㄚˊ ba2 186 utf8\n\n")
+        self.assertEqual(b.parse_base(text, st),
+                         [("誒", "ㄝˋ", True), ("你", "ㄋㄧˇ", True), ("㧊", "ㄅㄚˊ", False)])
         self.assertEqual(st["base_symbol_skipped"], 1)
         self.assertEqual(st["base_bad_reading"], 1)
         self.assertEqual(st["base_malformed"], 1)
@@ -40,7 +42,8 @@ class ParserTests(unittest.TestCase):
 class BuildTests(unittest.TestCase):
     def make_src(self, d):
         files = {
-            "BPMFBase.txt": "你 ㄋㄧˇ n i3 big5\n好 ㄏㄠˇ h3 big5\n好 ㄏㄠˋ h4 big5\nㄝ ㄝ e , big5\n",
+            "BPMFBase.txt": ("你 ㄋㄧˇ n i3 big5\n好 ㄏㄠˇ h3 big5\n好 ㄏㄠˋ h4 big5\nㄝ ㄝ e , big5\n"
+                             "㧊 ㄏㄠˋ h4 utf8\n"),
             "BPMFMappings.txt": "你好 ㄋㄧˇ ㄏㄠˇ\n",
             "phrase.occ": "你 5\n好 7\n你好 9\n",
             "BPMFPunctuations.txt": "x 1\n",
@@ -62,8 +65,9 @@ class BuildTests(unittest.TestCase):
             with open(os.path.join(o1, "lexicon.tsv"), encoding="utf-8") as f:
                 lines = f.read().splitlines()
             self.assertEqual(lines, sorted(lines))
-            self.assertIn("ㄋㄧˇ ㄏㄠˇ\t你好\t9", lines)
-            self.assertIn("ㄏㄠˋ\t好\t7", lines)
+            self.assertIn("ㄋㄧˇ ㄏㄠˇ\t你好\t9\t0", lines)
+            self.assertIn("ㄏㄠˋ\t好\t7\t0", lines)
+            self.assertIn("ㄏㄠˋ\t㧊\t0\t1", lines, "a non-Big5 character is marked rare")
 
 
 if __name__ == "__main__":

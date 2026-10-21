@@ -11,7 +11,7 @@ Windows typing behavior is unverified.
 
 ## Verified
 
-- Core: 32 acceptance cases, 25 behavior tests, 6 protocol tests, 2 C-interface
+- Core: 54 acceptance cases, 31 behavior tests, 6 protocol tests, 2 C-interface
   tests; `cargo test --workspace` passes.
 - Identifier protection (MI-20, MI-21): `_` and `@` keep an English word going, and
   URLs, paths, and identifiers keep half-width punctuation in full-width mode.
@@ -20,6 +20,8 @@ Windows typing behavior is unverified.
 - Zhuyin abbreviations with Tab (MI-24) and English completion with Tab (TP-1 to TP-7);
   Chinese associated phrases were considered and dropped.
 - CapsLock light means uppercase English letters (MI-25, ADR-0006).
+- Candidate order: common (Big5) characters come before rare ones on a frequency tie
+  (MI-10); rare characters no longer push common ones off page 1.
 - Expanded candidate grid (MI-22): Right opens a grid of every candidate; the macOS
   grid was rendered and inspected, not yet used by hand. Windows shows only the page
   holding the selection.
