@@ -158,6 +158,15 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   `MenuIcon.pdf` for both the input method and its mode, so the bundle is right and the
   menu agent was showing a cached icon; `TextInputMenuAgent` was restarted.
 
+### 2026-10-21 Menu icon and panel styling
+
+- Maintainer feedback: the icon should be bare arrows like the system's menu glyphs,
+  and the suggestion box looked off-center. The icon is now two opposite arrows with no
+  frame (stroke outlines filled, 1.6 pt). The panel is an opaque rounded card with even
+  padding; the completion is semibold, the typed part dimmed, and "Tab" is a smaller
+  hint lifted to the word's center. Both rendered and inspected; the candidate list uses
+  the same card.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

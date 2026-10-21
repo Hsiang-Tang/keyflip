@@ -1,6 +1,6 @@
-// Draws the menu bar icon (a filled rounded square with two knocked-out
-// opposite arrows) as a vector template PDF. The arrows are stroke outlines
-// filled with the even-odd rule, so the PDF needs no blend modes.
+// Draws the menu bar icon (two opposite arrows, no frame, like the system's
+// own menu bar glyphs) as a vector template PDF. The strokes are converted to
+// outlines and filled, so the PDF needs no stroke settings.
 // Usage: swiftc -o /tmp/make-icon macos/make-icon.swift && /tmp/make-icon macos/Resources/MenuIcon.pdf
 import CoreGraphics
 import Foundation
@@ -17,22 +17,18 @@ func arrow(from a: CGPoint, to b: CGPoint) {
     let angle = atan2(b.y - a.y, b.x - a.x)
     for d in [CGFloat.pi * 0.8, -CGFloat.pi * 0.8] {
         arrows.move(to: b)
-        arrows.addLine(to: CGPoint(x: b.x + 2.6 * cos(angle + d), y: b.y + 2.6 * sin(angle + d)))
+        arrows.addLine(to: CGPoint(x: b.x + 3.6 * cos(angle + d), y: b.y + 3.6 * sin(angle + d)))
     }
 }
-arrow(from: CGPoint(x: 4.5, y: 11.5), to: CGPoint(x: 13.5, y: 11.5))
-arrow(from: CGPoint(x: 13.5, y: 6.5), to: CGPoint(x: 4.5, y: 6.5))
-// Union the overlapping stroke pieces first so the even-odd fill sees one outline.
-let cut = arrows.copy(strokingWithWidth: 1.5, lineCap: .round, lineJoin: .round, miterLimit: 4)
+arrow(from: CGPoint(x: 2, y: 12), to: CGPoint(x: 16, y: 12))
+arrow(from: CGPoint(x: 16, y: 6), to: CGPoint(x: 2, y: 6))
+// Union the overlapping stroke pieces so the fill has one clean outline.
+let icon = arrows.copy(strokingWithWidth: 1.6, lineCap: .round, lineJoin: .round, miterLimit: 4)
     .normalized()
-
-let icon = CGMutablePath()
-icon.addRoundedRect(in: box.insetBy(dx: 0.5, dy: 0.5), cornerWidth: 4, cornerHeight: 4)
-icon.addPath(cut)
 
 ctx.beginPDFPage(nil)
 ctx.setFillColor(CGColor(gray: 0, alpha: 1))
 ctx.addPath(icon)
-ctx.fillPath(using: .evenOdd)
+ctx.fillPath()
 ctx.endPDFPage()
 ctx.closePDF()

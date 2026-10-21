@@ -7,12 +7,25 @@ final class CandidatePanel {
 
     private let panel: NSPanel
     private let label: NSTextField
+    /// Rounded opaque background; NSBox keeps its colors right in dark mode.
+    private let card: NSBox
+    private let inset = NSSize(width: 10, height: 6)
 
     private init() {
         label = NSTextField(labelWithString: "")
         label.isSelectable = false
         label.maximumNumberOfLines = 0
         label.lineBreakMode = .byClipping
+
+        card = NSBox()
+        card.boxType = .custom
+        card.titlePosition = .noTitle
+        card.contentViewMargins = .zero
+        card.cornerRadius = 8
+        card.borderWidth = 0.5
+        card.borderColor = NSColor.separatorColor
+        card.fillColor = NSColor.windowBackgroundColor
+        card.contentView?.addSubview(label)
 
         panel = NSPanel(
             contentRect: NSRect(x: 0, y: 0, width: 120, height: 40),
@@ -22,10 +35,10 @@ final class CandidatePanel {
         )
         panel.level = .popUpMenu
         panel.hasShadow = true
-        panel.isOpaque = true
-        panel.backgroundColor = NSColor.windowBackgroundColor
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
         panel.hidesOnDeactivate = false
-        panel.contentView = label
+        panel.contentView = card
     }
 
     /// Rows of the expanded grid shown at once; the view scrolls with the selection.
@@ -48,8 +61,9 @@ final class CandidatePanel {
 
     private func place(caret: NSRect) {
         let size = label.fittingSize
-        let frame = NSRect(x: 0, y: 0, width: max(size.width, 60), height: max(size.height, 24))
-        label.frame = frame
+        label.frame = NSRect(origin: NSPoint(x: inset.width, y: inset.height), size: size)
+        let frame = NSRect(x: 0, y: 0, width: size.width + 2 * inset.width, height: size.height + 2 * inset.height)
+        card.frame = frame
         panel.setContentSize(frame.size)
 
         // Below the caret line, kept on the screen that contains the caret.
@@ -72,11 +86,16 @@ final class CandidatePanel {
     /// strength, and the key that accepts it.
     func showSuggestion(typed: String, rest: String, caret: NSRect) {
         let text = NSMutableAttributedString()
-        text.append(cell(" \(typed)", selected: false, dim: true))
-        text.append(cell("\(rest) ", selected: false))
-        text.append(NSAttributedString(string: " Tab ", attributes: [
+        text.append(cell(typed, selected: false, dim: true))
+        text.append(NSAttributedString(string: rest, attributes: [
+            .font: NSFont.systemFont(ofSize: 15, weight: .semibold),
+            .foregroundColor: NSColor.labelColor,
+        ]))
+        // The hint is smaller; lift it so it sits on the word's optical center.
+        text.append(NSAttributedString(string: "   Tab", attributes: [
             .font: NSFont.systemFont(ofSize: 11, weight: .medium),
-            .foregroundColor: NSColor.secondaryLabelColor,
+            .foregroundColor: NSColor.tertiaryLabelColor,
+            .baselineOffset: 1.5,
         ]))
         label.attributedStringValue = text
         place(caret: caret)
