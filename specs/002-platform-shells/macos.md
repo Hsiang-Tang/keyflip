@@ -117,7 +117,7 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 - [ ] Test once each in Safari text fields, Chrome, VS Code (editor and terminal), a chat
       app, Notes, and Terminal.
 - [ ] Switching to another input method or window commits the composing text with no loss.
-- [ ] In a password field, including the keychain password prompt, letters, digits, and
+- [x] In a password field, including the keychain password prompt, letters, digits, and
       Shift letters type exactly as on the ABC keyboard; nothing is learned.
 - [ ] Up while composing: the composition does not disappear.
 - [ ] A shortcut such as Cmd+C while composing: the first press confirms the text, the
