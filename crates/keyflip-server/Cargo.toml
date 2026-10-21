@@ -1,0 +1,33 @@
+[package]
+name = "keyflip-server"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lib]
+name = "keyflip_server"
+path = "src/lib.rs"
+
+[[bin]]
+name = "keyflip-server"
+path = "src/main.rs"
+
+[[bin]]
+name = "keyflip-pipe-client"
+path = "src/bin/keyflip-pipe-client.rs"
+
+[dependencies]
+keyflip-core = { path = "../keyflip-core" }
+keyflip-proto = { path = "../keyflip-proto" }
+serde_json = "1"
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Authorization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Pipes",
+    "Win32_System_Threading",
+    "Win32_System_IO",
+] }

@@ -1,0 +1,38 @@
+# keyflip roadmap
+
+Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
+
+## Now: make the macOS build usable
+
+1. Build with `macos/build.sh` (done 2026-10-21).
+2. Walk the manual checklist in `specs/002-platform-shells/macos.md`. A failure that
+   is a judgment problem becomes a core acceptance case first, then gets fixed.
+3. Use it for daily typing for a week, note misjudged words, and adjust rules or add
+   cases.
+
+## Next
+
+4. Settings UI: space between Chinese and English (off by default), full-width default.
+5. Input method icon and menu name (the macOS icon is blank today).
+6. Identifier protection: port ruhi's classification rules (`snake_case`,
+   `kebab-case`, paths, `.json`) and output the protected ranges (KnowType's way).
+7. Windows: run `installer/install.ps1` on a machine with administrator rights and
+   verify with `specs/002-platform-shells/windows.md`. Rebuild `dist/`; the current
+   binaries predate the engine's Up-arrow change and are stale.
+8. Publish the repository (license work is done: `LICENSE`, `NOTICE`,
+   `THIRD_PARTY_LICENSES.md`, English list from wordfreq). Making it public is the
+   maintainer's decision.
+
+## Version 2
+
+9. Tab prediction (accept a suggestion, like VS Code).
+10. User lexicon and learning (candidate memory); must be inspectable, deletable, and
+    recoverable after corruption (TronIn's approach).
+11. Signing and notarization (macOS) and installer signing (Windows), only needed for
+    distribution to others.
+
+## Explicitly not doing
+
+- Single-tap modifier gestures (ADR-0002).
+- Fast-typing error correction.
+- Support for users who do not type tones.

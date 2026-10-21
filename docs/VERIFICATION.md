@@ -1,0 +1,83 @@
+# keyflip verification log
+
+## Required commands
+
+In WSL, run `source ~/.cargo/env` first and keep build output outside the repo:
+
+```
+export CARGO_TARGET_DIR=/root/keyflip-target
+cargo test --workspace                       # acceptance, behavior, protocol tests
+cargo run --release -p keyflip-cli -- eval   # Chinese/English misjudgment rates
+python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
+```
+
+## Log
+
+### 2026-10-21 Core engine
+
+- All 21 acceptance cases pass; 17 behavior tests and 5 protocol tests pass.
+- Evaluation (`keyflip-cli eval`):
+  - 4,940 Chinese phrases: 0 converted to English; 89.2% exactly correct.
+  - Chinese phrases, English words (rank above 100, three letters or more), and
+    2,778 sentences built from phrases: every English word preserved, 0 sentences wrong.
+  - English list of 9,884 words (lowercase plus Space): 46 misjudged (0.5%), all
+    one- or two-letter ambiguous words.
+- Two acceptance cases failed on the first run (trailing whitespace in the test file
+  was lost while editing); the `{sp}` notation fixed them. This shows the tests can
+  catch errors.
+
+### 2026-10-21 Windows shell and engine service
+
+- `tools/build-windows.sh` produces `keyflip_tsf.dll` (1.36 MB), `keyflip-server.exe`,
+  and `keyflip-pipe-client.exe`. The DLL has no lexicon (the protocol library's engine
+  feature is optional), no `comctl32` import, and exports four COM functions.
+- Engine service verified on real Windows: ping; `su3cl3<E>` commits the Chinese for
+  "hello"; `Hsiang<E>` commits `Hsiang`; two clients at once; a second instance exits
+  immediately; the process is gone after `--stop`.
+- `keyflip-tsf-smoke.exe` loads the DLL on real Windows (no registration, no
+  administrator rights): all dependencies resolve, the class factory is obtainable, a
+  foreign CLSID is rejected, the text service object can be created, and
+  `DllCanUnloadNow` reports unloadable after release.
+- Endpoint security on that machine blocked calling `cmd.exe` and `powershell.exe`
+  from WSL, so the install scripts have never been run.
+
+### 2026-10-21 C interface and macOS shell
+
+- `keyflip-ffi` tests pass (2); the engine gained "Up arrow is swallowed while
+  composing" with a behavior test; the whole workspace passes.
+- Static libraries for `aarch64-apple-darwin` and `x86_64-apple-darwin` (about 25 MB
+  each, need only `-lSystem -lc -lm`).
+
+### 2026-10-21 First macOS build (Apple Silicon)
+
+- `cargo test --workspace` passes.
+- `bash macos/build.sh --no-install` succeeds: the Swift shell compiled on the first
+  attempt and produced `macos/build/Keyflip.app`, signed ad hoc, signature verified.
+- Link warnings: the Rust static library targets macOS 26 while the shell deployment
+  target is macOS 12. Warnings only; no effect on local use.
+- `macos/build.sh` fix: this Mac's Rust comes from Homebrew without rustup, so the
+  script now adds the target only when rustup exists.
+- `bash macos/build.sh` installed the app to `~/Library/Input Methods`. Not yet added
+  as an input source and not yet used for typing.
+
+### 2026-10-21 English word list replaced (licensing)
+
+- `data/english.txt` now comes from wordfreq 3.1.1 (CC BY-SA 4.0) via
+  `tools/build_english.py`, replacing google-10000-english (redistribution not allowed).
+  Single letters other than `a` and `i`, corpus artifacts, and a short profanity blocklist
+  are removed.
+- `data/lexicon.tsv` rebuilt from the pinned McBopomofo commit: byte-identical.
+- `cargo test --workspace` passes (all 21 acceptance cases unchanged); tools tests pass (7).
+- Evaluation: 4,940 phrases, 0 leaked into English (89.2% exact); 2,858 Chinese-English-
+  Chinese sentences, 0 wrong; English ranks 0-10,000: 21 of 10,000 misjudged (0.2%).
+  The old list measured 46 of 9,884 (0.5%) but included all single letters, so the two
+  numbers are not directly comparable.
+
+### Not verified
+
+- TSF registration (`regsvr32`) and all real typing behavior (composition, candidate
+  window position, password fields, focus changes, sandboxed apps) on Windows:
+  needs a human on a real machine; checklist in `specs/002-platform-shells/windows.md`.
+- The install scripts have only had syntax and flow review.
+- macOS typing behavior; checklist in `specs/002-platform-shells/macos.md`.
+- Elevated (UAC) windows: no reference material; needs real testing.

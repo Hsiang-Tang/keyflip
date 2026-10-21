@@ -1,0 +1,122 @@
+# Plan and design: mixed input (001-mixed-input)
+
+Overall architecture: `docs/ARCHITECTURE.md`. Decision rationale: `docs/adr/`.
+
+## Architecture
+
+```
+ key ──► shell (Windows TSF / macOS IMK) ──► engine keyflip-core
+              ▲                                   │
+              └────────── full snapshot ◄─────────┘
+```
+
+- The engine is a pure library: `Engine::handle_key(KeyEvent) -> Snapshot`. No files,
+  windows, or system APIs.
+- A shell does two things: convert system keys into `KeyEvent`, and draw the `Snapshot` and
+  send committed text. It keeps no judgment state. If the engine is broken or unavailable,
+  the shell passes every key through.
+
+### Snapshot
+
+After each key the engine returns the complete state:
+
+- `handled`: whether the input method consumed the key.
+- `commit`: text to send to the application (possibly empty).
+- `preedit`: list of composition segments, each with text and kind (Chinese, English,
+  unfinished Zhuyin, selected).
+- `cursor`: cursor position in the composition, in UTF-16 units (convenient for Windows).
+- `candidates`: candidate window content (list, selected item, page); empty when closed.
+- `full_width`: whether full-width mode is on.
+
+## Key model
+
+`KeyEvent` carries the physical key (a character of the standard Zhuyin layout) and whether
+Shift, Ctrl, Alt, or Win (Meta) is down. Language judgment uses only "Shift plus letter";
+no modifier-only event is used.
+
+Standard Zhuyin layout:
+
+```
+1 ㄅ  2 ㄉ  3 ˇ  4 ˋ  5 ㄓ  6 ˊ  7 ˙  8 ㄚ  9 ㄞ  0 ㄢ  - ㄦ
+q ㄆ  w ㄊ  e ㄍ  r ㄐ  t ㄔ  y ㄗ  u ㄧ  i ㄛ  o ㄟ  p ㄣ
+a ㄇ  s ㄋ  d ㄎ  f ㄑ  g ㄕ  h ㄘ  j ㄨ  k ㄜ  l ㄠ  ; ㄤ
+z ㄈ  x ㄌ  c ㄏ  v ㄒ  b ㄖ  n ㄙ  m ㄩ  , ㄝ  . ㄡ  / ㄥ
+Space = first tone (no mark)
+```
+
+## Composition
+
+The composition is a sequence of units:
+
+- Zhuyin unit: one finished syllable (with tone, including Space for first tone), later
+  converted to Chinese characters or words.
+- English unit: one character. Each English letter is its own unit, so Left can move letter
+  by letter.
+
+There is also a short run of unfinished keys (pending) waiting for a tone or the next key to
+decide whether it is Zhuyin or English. Whole Chinese sentences are segmented with the
+McBopomofo lexicon by best path (Viterbi); characters the user picked by hand are pinned and
+not overwritten by recomputation.
+
+## Language judgment
+
+For each incoming key, apply in order:
+
+1. **Shift plus letter** is a definite English start. Lowercase letters in pending merge
+   into the same English word (`iPhone`). Following lowercase letters, digits, `.`, `-`, `_`,
+   and `'` stay in this word until Space or another symbol.
+2. **Tone keys (Space, 3, 4, 6, 7)**:
+   - Pending plus the tone forms a legal syllable: Chinese syllable.
+   - Otherwise pending becomes English and the tone key is an English character (Space ends
+     the English word and appends a space).
+   - Pending is empty: `3`, `4`, `6`, `7` are digits; Space opens the candidate window.
+3. **Other keys**: if pending plus the key is no longer the start of any legal syllable,
+   pending becomes English and the English word continues. The basis is Zhuyin structure:
+   the order of initial, medial, final, and tone, plus hard rules (ㄒ ㄐ ㄑ can only precede
+   ㄧ or ㄩ; ㄦ cannot follow an initial; an initial cannot follow an initial).
+4. **Short words legal both ways** (such as `ai`, `do`, `up`):
+   - Default Chinese.
+   - If the letters are a common English word (top 3,000 of the English list) and the
+     Zhuyin reading maps to an uncommon character (low frequency), judge English.
+   - With no tone key, this judgment happens when Space is pressed.
+
+A judgment can always be changed:
+
+- Enter: commit the raw letters (no trailing space).
+- Tab (while composing): cycle between raw, English, and Zhuyin.
+
+## Recovery and pass-through keys
+
+- With text in the composition, Enter only confirms the text and does not reach the
+  application; with an empty composition, Enter passes through.
+- Shift+Enter and Ctrl/Alt/Win plus any key: with text in the composition, confirm the text
+  and swallow the key (a second press takes effect); with no composition, pass through
+  untouched.
+- Tab: while composing, the cycle above; with an empty composition and no prediction
+  suggestion, pass through to the application (terminal completion).
+- Esc: close the candidate window; do not clear the composition.
+
+## Punctuation and full-width
+
+- Half-width by default. Shift+Space toggles full-width mode; all punctuation is full-width
+  in that mode.
+- `, . ; / -` are also Zhuyin keys (ㄝ ㄡ ㄤ ㄥ ㄦ), so they are held first: if the next key
+  is a tone key and forms a legal syllable they are Zhuyin, otherwise they are sent as
+  punctuation.
+- `.`, `-`, `_`, `'` inside an English word are always half-width.
+
+## Known limits (first version)
+
+- Chinese right after an English word needs a Space first to end the English word. Automatic
+  splitting comes later.
+- Two-letter abbreviations (such as `jp`, `ai`) default to Chinese; recover with Enter or Tab.
+- Only the standard Zhuyin layout.
+
+## Shell rules
+
+- The pre-check (`OnTestKeyDown`) and real handling (`OnKeyDown`) must give the same answer.
+- Password fields: send no keys, record nothing.
+- Pass NULL for `hklsubstitute` when registering the input method.
+- Never statically import `comctl32` or `TaskDialogIndirect`.
+- Collapse the selection after committing text, or Notepad lets the next character overwrite
+  the previous one.

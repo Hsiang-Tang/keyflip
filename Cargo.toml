@@ -1,0 +1,8 @@
+[workspace]
+resolver = "2"
+members = ["crates/keyflip-core", "crates/keyflip-cli", "crates/keyflip-proto", "crates/keyflip-server", "crates/keyflip-tsf", "crates/keyflip-ffi"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+publish = false

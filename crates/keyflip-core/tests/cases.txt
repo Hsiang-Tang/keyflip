@@ -1,0 +1,45 @@
+# keyflip acceptance cases (machine readable; owner: specs/001-mixed-input/acceptance.md)
+#
+# Format: id <TAB> keys <TAB> expected total committed text
+#
+# Key notation (standard zhuyin layout, US keyboard):
+#   a-z 0-9 , . ; / - '   the physical key, no Shift
+#   A-Z                   Shift + that letter
+#   _                     space bar
+#   <E> Enter   <T> Tab   <L> Left   <R> Right   <D> Down   <B> Backspace
+#   <S-E>                 Shift + Enter
+# Expected is the concatenation of everything the engine committed.
+# {sp} stands for a space (trailing spaces are easy to lose in editors).
+
+# --- positive: Chinese stays Chinese ---
+P01	su3cl3<E>	你好
+P02	hk4g4<E>	測試
+P03	ji32k7<E>	我的
+
+# --- positive: Shift+letter starts English ---
+P10	Hsiang<E>	Hsiang
+P11	API<E>	API
+P12	iPhone<E>	iPhone
+P13	Hsiang_su3cl3<E>	Hsiang 你好
+P14	su3cl3Hsiang<E>	你好Hsiang
+
+# --- positive: lowercase English found by zhuyin structure ---
+P20	github_<E>	github{sp}
+P21	the_<E>	the{sp}
+P22	z-index<E>	z-index
+P23	docker<E>	docker
+P24	npm_install<E>	npm install
+
+# --- positive: digits ---
+P30	192.168.1.1<E>	192.168.1.1
+P31	2026<E>	2026
+P32	user2024<E>	user2024
+
+# --- boundary ---
+B01	<E>
+B02	ai<E>	ai
+B03	su3cl3Hsiang_su3cl3<E>	你好Hsiang 你好
+
+# --- recovery ---
+R01	ai<T><E>	ai
+R02	su3cl3<L><B><E>	好

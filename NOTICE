@@ -1,0 +1,21 @@
+keyflip's source code is MIT licensed (see LICENSE). The files in data/ are derived
+from the following third-party sources, which keep their own licenses. Full license
+texts are in THIRD_PARTY_LICENSES.md.
+
+1. McBopomofo data (https://github.com/openvanilla/McBopomofo, Source/Data)
+   - Files used: BPMFBase.txt, BPMFMappings.txt, phrase.occ, BPMFPunctuations.txt
+   - License: MIT, Copyright (c) 2011-2026 Mengjuei Hsieh et al.
+   - BPMFMappings.txt is derived from libtabe's tsi.src (BSD-style license,
+     Copyright (c) 1999 TaBE Project, Pai-Hsiang Hsiao, and Computer Systems and
+     Communication Lab, Institute of Information Science, Academia Sinica).
+   - Used to build data/lexicon.tsv (phrase to reading to frequency).
+   - Pinned upstream commit: data/SOURCES.txt.
+
+2. wordfreq (https://github.com/rspeer/wordfreq)
+   - Used to build data/english.txt, a ranked list of the 10,000 most frequent
+     English words (tools/build_english.py).
+   - Data license: Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0).
+     data/english.txt is an adaptation of that data and is shared under the same
+     license. Changes: filtered to lowercase a-z words, removed corpus artifacts
+     and a short blocklist, truncated to 10,000 entries.
+   - Package version: data/ENGLISH_SOURCE.txt.

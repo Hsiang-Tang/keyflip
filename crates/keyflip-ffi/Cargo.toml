@@ -1,0 +1,12 @@
+[package]
+name = "keyflip-ffi"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+keyflip-core = { path = "../keyflip-core" }
+keyflip-proto = { path = "../keyflip-proto" }
