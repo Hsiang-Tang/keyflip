@@ -290,6 +290,13 @@ impl Engine {
     // ---- characters ----
 
     fn char_key(&mut self, c: char, ev: KeyEvent) {
+        if ev.caps_lock && c.is_ascii_alphabetic() {
+            // MI-25: the light means uppercase English; Shift inverts it.
+            self.flush_pending();
+            let letter = if ev.shift { c.to_ascii_lowercase() } else { c.to_ascii_uppercase() };
+            self.insert(Group::latin(letter));
+            return;
+        }
         if ev.shift {
             self.flush_pending();
             if c.is_ascii_alphabetic() {

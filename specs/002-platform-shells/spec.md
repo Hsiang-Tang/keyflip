@@ -9,6 +9,8 @@ engine and shell.
   committed text. It keeps no judgment state and never judges language.
 - PS-2 Key identity uses physical position (US-layout characters), not the active keyboard
   layout, identical on Windows and macOS.
+- PS-12 Every key carries the CapsLock light as `caps_lock`; the CapsLock key itself is
+  never sent (ADR-0006).
 - PS-3 Only keyDown is handled. Single-tap Shift, CapsLock, or any modifier-only event must
   have no effect.
 - PS-4 The two questions about whether to consume a key (Windows `OnTestKeyDown` and

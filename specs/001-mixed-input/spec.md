@@ -47,6 +47,11 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
   (`form4`, `item3` stay as typed). The longest such tail wins. First-tone syllables
   still need a Space before them, because Space also ends an English word.
 
+- MI-25 With the CapsLock light on, letters are uppercase English letters, as if Shift
+  were held; Shift with the light on gives lowercase English letters. Digits,
+  punctuation, tones, and other keys are unaffected, and the CapsLock key alone does
+  nothing (ADR-0006).
+
 ### Recovery
 
 - MI-7 Enter while composing commits the composition as shown and does nothing else.

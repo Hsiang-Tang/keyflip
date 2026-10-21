@@ -7,6 +7,7 @@
 #   A-Z                   Shift + that letter
 #   ~ ! @ # $ % ^ & * ( ) + { } | : " ?   Shift + the key that types them
 #   <S-k>                 Shift + plain key k, e.g. <S--> types _
+#   <C>                   CapsLock light toggles for the keys that follow (no key sent)
 #   _                     space bar
 #   <E> Enter   <T> Tab   <L> Left   <R> Right   <D> Down   <B> Backspace
 #   <S-E>                 Shift + Enter   <S-_> Shift + Space (full-width toggle)
@@ -62,6 +63,12 @@ G04	form4<E>	form4
 G05	item3<E>	item3
 G06	user2024<E>	user2024
 G07	entercjo4<T><E>	entercjo4
+
+# --- CapsLock light (MI-25) ---
+K01	<C>docker<E>	DOCKER
+K02	su3cl3<C>api<C>su3<E>	你好API你
+K03	<C>dO<E>	Do
+K04	<C>2026<E>	2026
 
 # --- identifier protection (MI-20, MI-21) ---
 I01	my<S-->ai_su3<E>	my_ai 你

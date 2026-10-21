@@ -17,7 +17,8 @@ the tap-versus-hold threshold (0.2 s, 0.3 s, or none).
 - On macOS the shell requests keyDown only, so the system never sends flagsChanged.
 - Shift matters only combined with a letter (an English word starting in capitals),
   which is normal typing.
-- CapsLock state does not affect judgment.
+- CapsLock state does not affect judgment. Superseded 2026-10-21 by ADR-0006: the
+  CapsLock light now means uppercase English letters, never a language switch.
 
 ## Consequences
 

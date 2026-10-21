@@ -25,6 +25,9 @@ Format: task, requirements covered, verification, status.
   Status: done (2026-10-21).
 - T-MI-10 Zhuyin abbreviations with Tab. Requirement MI-24. Verification: cases R03 to
   R07. Status: done (2026-10-21).
+- T-MI-11 CapsLock light means uppercase letters. Requirement MI-25, ADR-0006.
+  Verification: cases K01 to K04, protocol and Windows key-map tests. Status: done
+  (2026-10-21) in the engine and macOS shell; Windows reads the light, unverified.
 - T-MI-7 Tab prediction. Moved to `specs/003-tab-prediction/`; English completion done
   (2026-10-21).
 

@@ -73,7 +73,9 @@ Then remove "keyflip Zhuyin" in System Settings and log out and back in.
   arrive, so they cannot do anything.
 - Key identity uses the physical key position (US-layout characters), not the active keyboard
   layout, so it matches Windows.
-- CapsLock state does not affect `shift`.
+- CapsLock state does not affect `shift`; the light is sent as `caps_lock` and the engine
+  makes letters uppercase English while it is on (ADR-0006). Turn off the system setting
+  "Use Caps Lock to switch to and from ABC", or macOS takes the key first.
 - While composing, a key the engine does not consume does not clear the composition (the
   engine swallows useless keys such as Up).
 - When the input method is switched away or the application asks to commit, the shell sends
@@ -105,7 +107,10 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
       arrows move, a digit picks from the highlighted row, Esc returns to the list.
 - [ ] The candidate window appears next to the cursor without covering the text being
       typed; at the bottom of the screen it appears above.
-- [ ] A Shift tap, a CapsLock tap, and a CapsLock long press change nothing about input.
+- [ ] A Shift tap changes nothing. A CapsLock press only turns the light on or off and
+      switches nothing.
+- [ ] With the CapsLock light on, `docker` gives `DOCKER`; Shift+`a` gives `a`; digits
+      stay digits. With the light off, Zhuyin works again.
 - [ ] Shift+Space toggles full-width: punctuation becomes full-width; again returns to
       half-width.
 - [ ] Test once each in Safari text fields, Chrome, VS Code (editor and terminal), a chat

@@ -4,8 +4,9 @@ import Cocoa
 ///
 /// The key identity comes from the physical key position (the US layout
 /// character), never from the current keyboard layout, so zhuyin keys land on
-/// the same positions as on Windows. CapsLock is ignored on purpose, and only
-/// keyDown events are ever handled, so tapping Shift or CapsLock does nothing.
+/// the same positions as on Windows. The CapsLock light travels as
+/// `caps_lock` for the engine (ADR-0006); only keyDown events are ever handled,
+/// so tapping Shift or CapsLock alone does nothing.
 enum KeyMap {
     /// Non-printing keys, by virtual key code.
     private static let named: [UInt16: String] = [
@@ -47,6 +48,7 @@ enum KeyMap {
             "ctrl": flags.contains(.control),
             "alt": flags.contains(.option),
             "meta": flags.contains(.command),
+            "caps_lock": flags.contains(.capsLock),
         ]
         // The character this press produces (for example "H" or "?"), only
         // when it is a single printable scalar.

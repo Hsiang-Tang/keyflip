@@ -44,6 +44,9 @@ pub struct Key {
     pub alt: bool,
     #[serde(default)]
     pub meta: bool,
+    /// The CapsLock light, not the key; absent from older shells.
+    #[serde(default)]
+    pub caps_lock: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -133,6 +136,7 @@ impl Key {
             ctrl: self.ctrl,
             alt: self.alt,
             meta: self.meta,
+            caps_lock: self.caps_lock,
         })
     }
 }
@@ -292,6 +296,7 @@ mod tests {
             ctrl: false,
             alt: false,
             meta: false,
+            caps_lock: false,
         }
     }
 

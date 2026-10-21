@@ -33,21 +33,23 @@ pub const VK_RCONTROL: u32 = 0xA3;
 pub const VK_LMENU: u32 = 0xA4;
 pub const VK_RMENU: u32 = 0xA5;
 
-/// Which modifiers are physically down.
+/// Which modifiers are physically down, plus the CapsLock light.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct Mods {
     pub shift: bool,
     pub ctrl: bool,
     pub alt: bool,
     pub meta: bool,
+    /// The CapsLock toggle state (ADR-0006), not whether the key is down.
+    pub caps_lock: bool,
 }
 
 /// Read modifiers from a 256-entry `GetKeyboardState` array. Entry bit 0x80
-/// means "down". The CapsLock toggle (VK_CAPITAL, 0x14) is deliberately not
-/// consulted.
+/// means "down"; bit 0x01 of VK_CAPITAL (0x14) is the CapsLock light.
 pub fn mods_from_state(state: &[u8; 256]) -> Mods {
     let down = |vk: u32| state[vk as usize] & 0x80 != 0;
     Mods {
+        caps_lock: state[0x14] & 0x01 != 0,
         shift: down(VK_SHIFT) || down(VK_LSHIFT) || down(VK_RSHIFT),
         ctrl: down(VK_CONTROL) || down(VK_LCONTROL) || down(VK_RCONTROL),
         alt: down(VK_MENU) || down(VK_LMENU) || down(VK_RMENU),
@@ -188,6 +190,7 @@ pub fn translate(
         ctrl: mods.ctrl,
         alt: mods.alt,
         meta: mods.meta,
+        caps_lock: mods.caps_lock,
     })
 }
 
@@ -299,10 +302,14 @@ mod tests {
     #[test]
     fn capslock_never_counts_as_shift() {
         let mut st = [0u8; 256];
-        st[0x14] = 0x01; // CapsLock toggled on (low bit)
-        assert_eq!(mods_from_state(&st), Mods::default());
+        let light_only = Mods {
+            caps_lock: true,
+            ..Mods::default()
+        };
+        st[0x14] = 0x01; // CapsLock toggled on (low bit): reported as the light only
+        assert_eq!(mods_from_state(&st), light_only);
         st[0x14] = 0x81; // even while the key itself is held
-        assert_eq!(mods_from_state(&st), Mods::default());
+        assert_eq!(mods_from_state(&st), light_only);
         st[VK_LSHIFT as usize] = 0x80;
         assert!(mods_from_state(&st).shift);
         let mut st = [0u8; 256];
@@ -317,11 +324,16 @@ mod tests {
 
     #[test]
     fn text_may_reflect_capslock_but_shift_does_not() {
-        // CapsLock on, no Shift: the layout types "H", shift stays false.
-        let k = translate(b'H' as u32, 0x23, false, none(), Some('H')).unwrap();
+        // CapsLock on, no Shift: the layout types "H", shift stays false, and
+        // the light travels as caps_lock for the engine to read.
+        let m = Mods {
+            caps_lock: true,
+            ..Mods::default()
+        };
+        let k = translate(b'H' as u32, 0x23, false, m, Some('H')).unwrap();
         assert_eq!(k.code, "h");
         assert_eq!(k.text, Some('H'));
-        assert!(!k.shift);
+        assert!(!k.shift && k.caps_lock);
     }
 
     #[test]
@@ -353,6 +365,15 @@ mod tests {
         };
         let k = translate(b'C' as u32, 0x2E, false, m, None).unwrap();
         assert_eq!((k.code.as_str(), k.ctrl, k.text), ("c", true, None));
+    }
+
+    #[test]
+    fn capslock_light_is_the_toggle_bit_not_the_down_bit() {
+        let mut state = [0u8; 256];
+        state[0x14] = 0x80;
+        assert!(!mods_from_state(&state).caps_lock, "held but light off");
+        state[0x14] = 0x01;
+        assert!(mods_from_state(&state).caps_lock);
     }
 
     #[test]

@@ -167,6 +167,18 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   hint lifted to the word's center. Both rendered and inspected; the candidate list uses
   the same card.
 
+### 2026-10-21 CapsLock light means uppercase (MI-25, ADR-0006)
+
+- Maintainer request: all-caps words without holding Shift. ADR-0006 amends ADR-0002:
+  the light means uppercase letters, never a language switch.
+- Cases K01 to K04 were written with the change but not run before it, so they have no
+  recorded failing run; without the engine branch the light is ignored and K01 would
+  give `docker`.
+- The key notation gained `<C>`. The Windows key map reads the light from the toggle
+  bit; its existing "CapsLock never counts as Shift" test now also checks the light is
+  reported, and a new test checks the toggle bit, not the down bit, is read.
+- `cargo test --workspace` passes; evaluation output identical.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

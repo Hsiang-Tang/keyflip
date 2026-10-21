@@ -4,7 +4,8 @@ Principles that every spec, plan, and change must respect. Changing one requires
 ADR in `docs/adr/`.
 
 1. **No mode toggle gestures.** Language is decided from the key sequence alone.
-   No single-tap Shift, CapsLock, or other modifier-only gesture, ever (ADR-0002).
+   No single-tap Shift, CapsLock, or other modifier-only gesture, ever (ADR-0002). The
+   CapsLock light only means uppercase letters (ADR-0006).
 2. **One brain.** All language judgment lives in `keyflip-core`. Platform shells
    only forward keys and draw the snapshot they are given (ADR-0001).
 3. **Snapshot protocol.** One key in, one complete state out. Shells keep no

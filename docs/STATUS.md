@@ -19,6 +19,7 @@ Windows typing behavior is unverified.
   English word with no Space (MI-23): glued sentences 1.0% wrong, down from 100%.
 - Zhuyin abbreviations with Tab (MI-24) and English completion with Tab (TP-1 to TP-7);
   Chinese associated phrases were considered and dropped.
+- CapsLock light means uppercase English letters (MI-25, ADR-0006).
 - Expanded candidate grid (MI-22): Right opens a grid of every candidate; the macOS
   grid was rendered and inspected, not yet used by hand. Windows shows only the page
   holding the selection.

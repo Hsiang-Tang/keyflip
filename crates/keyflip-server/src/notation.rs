@@ -26,6 +26,7 @@ pub fn to_wire(ev: &KeyEvent) -> Key {
         ctrl: ev.ctrl,
         alt: ev.alt,
         meta: ev.meta,
+        caps_lock: ev.caps_lock,
     }
 }
 

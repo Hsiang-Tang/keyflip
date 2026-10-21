@@ -31,11 +31,20 @@ pub fn bundled_engine(opt: Options) -> Engine {
 /// `~ ! @ # $ % ^ & * ( ) + { } | : " ?` Shift+the key that types them,
 /// `<S-k>` Shift+the plain key `k` (for example `<S-->` types `_`),
 /// `<E>` Enter, `<S-E>` Shift+Enter, `<T>` Tab, `<L>` `<R>` `<D>` `<U>` arrows,
-/// `<B>` Backspace, `<X>` Esc, `<S-_>` Shift+Space.
+/// `<B>` Backspace, `<X>` Esc, `<S-_>` Shift+Space, `<C>` toggles the CapsLock light
+/// for the keys that follow (it sends no key itself).
 pub fn parse_keys(s: &str) -> Result<Vec<KeyEvent>, String> {
-    let mut out = Vec::new();
+    let mut out: Vec<KeyEvent> = Vec::new();
+    let mut caps = false;
+    // Events pushed since the last pass get the light as it was when they were
+    // typed; `<C>` pushes nothing, so the light never changes mid-pass.
+    let mut marked = 0;
     let mut chars = s.chars().peekable();
     while let Some(c) = chars.next() {
+        for ev in &mut out[marked..] {
+            ev.caps_lock = caps;
+        }
+        marked = out.len();
         if c == '<' {
             let mut name = String::new();
             loop {
@@ -44,6 +53,10 @@ pub fn parse_keys(s: &str) -> Result<Vec<KeyEvent>, String> {
                     Some(ch) => name.push(ch),
                     None => return Err(format!("unterminated <{name}")),
                 }
+            }
+            if name == "C" {
+                caps = !caps;
+                continue;
             }
             let (shift, base) = match name.strip_prefix("S-") {
                 Some(rest) => (true, rest),
@@ -83,6 +96,9 @@ pub fn parse_keys(s: &str) -> Result<Vec<KeyEvent>, String> {
         } else {
             out.push(KeyEvent::plain(KeyCode::Char(c)));
         }
+    }
+    for ev in &mut out[marked..] {
+        ev.caps_lock = caps;
     }
     Ok(out)
 }

@@ -29,6 +29,8 @@ pub struct KeyEvent {
     pub ctrl: bool,
     pub alt: bool,
     pub meta: bool,
+    /// The CapsLock light is on: letters are uppercase English (ADR-0006).
+    pub caps_lock: bool,
 }
 
 impl KeyEvent {
@@ -43,6 +45,7 @@ impl KeyEvent {
             ctrl: false,
             alt: false,
             meta: false,
+            caps_lock: false,
         }
     }
 
