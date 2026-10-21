@@ -3,13 +3,14 @@
 //! Language is never switched by a modifier tap. Every key is read as zhuyin
 //! unless the typed sequence can no longer be zhuyin (see specs/001-mixed-input/plan.md).
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use crate::convert::{self, Candidate, Unit};
 use crate::english::English;
 use crate::key::{KeyCode, KeyEvent};
 use crate::lexicon::Lexicon;
 use crate::snapshot::{Candidates, SegKind, Segment, Snapshot};
+use crate::user::UserModel;
 use crate::zhuyin;
 
 const PAGE_SIZE: usize = 9;
@@ -51,6 +52,8 @@ struct Group {
     /// Punct typed in full-width mode; rendered full-width unless protected.
     wide: bool,
     fixed: Option<String>,
+    /// Length of a hand-picked candidate starting here (UL-1).
+    picked: Option<usize>,
 }
 
 impl Group {
@@ -60,6 +63,7 @@ impl Group {
             ch: c,
             wide: false,
             fixed: None,
+            picked: None,
         }
     }
 
@@ -69,6 +73,7 @@ impl Group {
             ch: ' ',
             wide: false,
             fixed: None,
+            picked: None,
         }
     }
 
@@ -108,6 +113,9 @@ pub struct Engine {
     full_width: bool,
     window: Option<Window>,
     flip: Option<Flip>,
+    user: Option<Arc<Mutex<UserModel>>>,
+    /// False on the `would_handle` copy.
+    learn: bool,
 }
 
 fn is_word_char(c: char) -> bool {
@@ -136,7 +144,14 @@ impl Engine {
             full_width: false,
             window: None,
             flip: None,
+            user: None,
+            learn: true,
         }
+    }
+
+    pub fn with_user(mut self, user: Arc<Mutex<UserModel>>) -> Engine {
+        self.user = Some(user);
+        self
     }
 
     pub fn reset(&mut self) {
@@ -161,7 +176,9 @@ impl Engine {
     /// A shell's pre-check (for example TSF `OnTestKeyDown`) must use this so
     /// it always agrees with the real handling.
     pub fn would_handle(&self, ev: KeyEvent) -> bool {
-        self.clone().handle_key(ev).handled
+        let mut probe = self.clone();
+        probe.learn = false;
+        probe.handle_key(ev).handled
     }
 
     /// Current state without consuming a key.
@@ -487,6 +504,7 @@ impl Engine {
             ch: c,
             wide: self.full_width,
             fixed: None,
+            picked: None,
         }
     }
 
@@ -699,6 +717,12 @@ impl Engine {
         if prefix.len() < 3 || glued {
             return None;
         }
+        if let Some(user) = &self.user {
+            let user = user.lock().unwrap_or_else(|e| e.into_inner());
+            if let Some(rest) = user.complete(&prefix) {
+                return Some(rest.to_owned());
+            }
+        }
         self.eng.complete(&prefix, WORD_RANK_CUTOFF as usize).map(str::to_owned)
     }
 
@@ -748,7 +772,9 @@ impl Engine {
             return;
         }
         let units = self.run_units(target);
-        let cands = convert::candidates(&self.lex, &units, 0);
+        let user = self.user.as_ref().map(|u| u.lock().unwrap_or_else(|e| e.into_inner()));
+        let cands = convert::candidates(&self.lex, user.as_deref(), &units, 0);
+        drop(user);
         if cands.is_empty() {
             return;
         }
@@ -852,7 +878,11 @@ impl Engine {
         for (k, ch) in cand.text.chars().enumerate() {
             if let Some(g) = self.groups.get_mut(w.target + k) {
                 g.fixed = Some(ch.to_string());
+                g.picked = None;
             }
+        }
+        if let Some(g) = self.groups.get_mut(w.target) {
+            g.picked = Some(cand.len);
         }
         self.cursor = (w.target + cand.len).min(self.groups.len());
     }
@@ -860,12 +890,13 @@ impl Engine {
     // ---- output ----
 
     fn group_texts(&self) -> Vec<String> {
+        let user = self.user.as_ref().map(|u| u.lock().unwrap_or_else(|e| e.into_inner()));
         let mut out = vec![String::new(); self.groups.len()];
         let mut i = 0;
         while i < self.groups.len() {
             if self.groups[i].is_syllable() {
                 let units = self.run_units(i);
-                let texts = convert::convert(&self.lex, &units);
+                let texts = convert::convert(&self.lex, user.as_deref(), &units);
                 for (k, t) in texts.into_iter().enumerate() {
                     out[i + k] = t;
                 }
@@ -902,8 +933,70 @@ impl Engine {
                 || self.groups[start..=i].iter().all(|g| is_path_lead(g.ch)))
     }
 
+    /// Intact picks as (readings, text, previous reading) (UL-1).
+    fn committed_picks(&self) -> Vec<(Vec<String>, String, String)> {
+        let reading = |g: &Group| match &g.kind {
+            Kind::Syllable(r) => Some(r.clone()),
+            _ => None,
+        };
+        let mut out = Vec::new();
+        for (i, g) in self.groups.iter().enumerate() {
+            let Some(len) = g.picked else { continue };
+            let Some(span) = self.groups.get(i..i + len) else { continue };
+            let (Some(readings), Some(text)) = (
+                span.iter().map(reading).collect::<Option<Vec<_>>>(),
+                span.iter().map(|g| g.fixed.clone()).collect::<Option<String>>(),
+            ) else {
+                continue;
+            };
+            let context = i
+                .checked_sub(1)
+                .and_then(|p| reading(&self.groups[p]))
+                .unwrap_or_default();
+            out.push((readings, text, context));
+        }
+        out
+    }
+
+    /// Lowercase words with nothing glued to either side (UL-11).
+    fn committed_words(&self) -> Vec<String> {
+        let letter = |g: &Group| matches!(g.kind, Kind::Latin) && g.ch.is_ascii_lowercase();
+        let glue = |g: &Group| !g.is_syllable() && (is_word_char(g.ch) || g.ch == '/');
+        let mut out = Vec::new();
+        let mut i = 0;
+        while i < self.groups.len() {
+            if !letter(&self.groups[i]) {
+                i += 1;
+                continue;
+            }
+            let start = i;
+            while i < self.groups.len() && letter(&self.groups[i]) {
+                i += 1;
+            }
+            let glued_before = start > 0 && glue(&self.groups[start - 1]);
+            let glued_after = i < self.groups.len() && glue(&self.groups[i]);
+            if !glued_before && !glued_after {
+                out.push(self.groups[start..i].iter().map(|g| g.ch).collect());
+            }
+        }
+        out
+    }
+
     fn commit_all(&mut self, commit: &mut String) {
         self.pending_to_symbols();
+        if let (true, Some(user)) = (self.learn, &self.user) {
+            let picks = self.committed_picks();
+            let words = self.committed_words();
+            if !picks.is_empty() || !words.is_empty() {
+                let mut user = user.lock().unwrap_or_else(|e| e.into_inner());
+                for (readings, text, context) in picks {
+                    user.learn(&readings, &text, &context);
+                }
+                for word in words {
+                    user.learn_word(&word);
+                }
+            }
+        }
         let texts = self.group_texts();
         for (i, t) in texts.iter().enumerate() {
             if self.opt.cjk_spacing && i > 0 {

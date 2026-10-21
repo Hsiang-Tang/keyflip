@@ -1,5 +1,8 @@
 # keyflip on Windows: build, install, and manual acceptance
 
+Unmaintained since 2026-10-21 (ADR-0008, macOS only). Kept for reference; features
+added after that date are not ported.
+
 On Windows keyflip consists of three files:
 
 - `keyflip_tsf.dll`: the input method shell. The Windows Text Services Framework (TSF, the

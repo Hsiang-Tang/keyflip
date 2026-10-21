@@ -3,12 +3,24 @@
 
 use std::ffi::{c_char, CStr, CString};
 use std::panic::{catch_unwind, AssertUnwindSafe};
-use std::sync::OnceLock;
+use std::path::Path;
+use std::sync::{Mutex, OnceLock};
 
 use keyflip_core::Options;
 use keyflip_proto::{Session, Shared};
 
+mod user_store;
+use user_store::UserStore;
+
 static SHARED: OnceLock<Shared> = OnceLock::new();
+static USER: OnceLock<Mutex<UserStore>> = OnceLock::new();
+
+fn with_user(f: impl FnOnce(&mut UserStore)) {
+    if let Some(store) = USER.get() {
+        let mut store = store.lock().unwrap_or_else(|e| e.into_inner());
+        f(&mut store);
+    }
+}
 
 pub struct KeyflipSession {
     inner: Session,
@@ -47,7 +59,16 @@ fn to_c(s: String) -> *mut c_char {
 #[no_mangle]
 pub extern "C" fn keyflip_session_new() -> *mut KeyflipSession {
     catch_unwind(|| {
-        let shared = SHARED.get_or_init(Shared::bundled);
+        let shared = SHARED.get_or_init(|| {
+            let shared = Shared::bundled();
+            match USER.get() {
+                Some(store) => {
+                    let model = store.lock().unwrap_or_else(|e| e.into_inner()).model.clone();
+                    shared.with_user(model)
+                }
+                None => shared,
+            }
+        });
         Box::into_raw(Box::new(KeyflipSession {
             inner: shared.session(Options::default()),
         }))
@@ -79,11 +100,42 @@ pub unsafe extern "C" fn keyflip_handle(
     };
     let session = &mut *session;
     match catch_unwind(AssertUnwindSafe(|| {
-        session.inner.handle_payload(request.as_bytes())
+        let reply = session.inner.handle_payload(request.as_bytes());
+        with_user(UserStore::save_if_changed);
+        reply
     })) {
         Ok(bytes) => to_c(String::from_utf8_lossy(&bytes).into_owned()),
         Err(_) => error_response("engine panic"),
     }
+}
+
+/// Opens the user files in `dir`. Call once, before the first session.
+///
+/// # Safety
+/// `dir` must be NULL or a NUL-terminated UTF-8 path.
+#[no_mangle]
+pub unsafe extern "C" fn keyflip_user_open(dir: *const c_char) -> i32 {
+    if dir.is_null() {
+        return -1;
+    }
+    let Ok(dir) = CStr::from_ptr(dir).to_str() else {
+        return -1;
+    };
+    let dir = Path::new(dir).to_owned();
+    match catch_unwind(move || USER.set(Mutex::new(UserStore::open(&dir))).is_ok()) {
+        Ok(true) => 0,
+        _ => -1,
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn keyflip_user_reload() {
+    let _ = catch_unwind(|| with_user(UserStore::reload));
+}
+
+#[no_mangle]
+pub extern "C" fn keyflip_user_clear() {
+    let _ = catch_unwind(|| with_user(UserStore::clear));
 }
 
 /// # Safety

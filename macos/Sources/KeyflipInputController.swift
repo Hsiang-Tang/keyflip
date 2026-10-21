@@ -14,6 +14,12 @@ private let log = Logger(subsystem: "com.hsiangtang.inputmethod.keyflip", catego
 ///   host clear the marked text, so the engine swallows such keys itself.
 /// - Only keyDown is requested. Modifier-only events are never delivered, so
 ///   a lone Shift or CapsLock press cannot do anything.
+enum UserFiles {
+    static let directory = FileManager.default
+        .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        .appendingPathComponent("keyflip", isDirectory: true)
+}
+
 @objc(KeyflipInputController)
 final class KeyflipInputController: IMKInputController {
     private let session = EngineSession()
@@ -49,6 +55,37 @@ final class KeyflipInputController: IMKInputController {
         log.notice("host commit, composing=\(self.composing, privacy: .public)")
         guard let client = sender as? IMKTextInput, let state = session.flush() else { return }
         apply(state, to: client)
+    }
+
+    override func activateServer(_ sender: Any!) {
+        super.activateServer(sender)
+        // Picks up hand edits of the user files.
+        keyflip_user_reload()
+    }
+
+    // MARK: input menu
+
+    override func menu() -> NSMenu! {
+        let menu = NSMenu()
+        let chinese = Locale.preferredLanguages.first?.hasPrefix("zh") ?? false
+        let items: [(String, String, Selector)] = [
+            ("Clear Learned Choices", "清除學習紀錄", #selector(clearLearned(_:))),
+            ("Open User Dictionary Folder", "打開使用者詞庫資料夾", #selector(openUserFolder(_:))),
+        ]
+        for (english, zh, action) in items {
+            let item = NSMenuItem(title: chinese ? zh : english, action: action, keyEquivalent: "")
+            item.target = self
+            menu.addItem(item)
+        }
+        return menu
+    }
+
+    @objc private func clearLearned(_ sender: Any?) {
+        keyflip_user_clear()
+    }
+
+    @objc private func openUserFolder(_ sender: Any?) {
+        NSWorkspace.shared.open(UserFiles.directory)
     }
 
     override func deactivateServer(_ sender: Any!) {

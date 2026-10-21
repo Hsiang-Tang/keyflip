@@ -9,11 +9,12 @@
 
 use std::io::{self, Read, Write};
 #[cfg(feature = "engine")]
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 #[cfg(feature = "engine")]
 use keyflip_core::{
-    Candidates, Engine, English, KeyCode, KeyEvent, Lexicon, Options, SegKind, Segment, Snapshot,
+    user::UserModel, Candidates, Engine, English, KeyCode, KeyEvent, Lexicon, Options, SegKind,
+    Segment, Snapshot,
 };
 use serde::{Deserialize, Serialize};
 
@@ -188,6 +189,7 @@ fn state_of(s: Snapshot) -> Response {
 pub struct Shared {
     lex: Arc<Lexicon>,
     eng: Arc<English>,
+    user: Option<Arc<Mutex<UserModel>>>,
 }
 
 #[cfg(feature = "engine")]
@@ -196,12 +198,22 @@ impl Shared {
         Shared {
             lex: Arc::new(Lexicon::bundled()),
             eng: Arc::new(English::bundled()),
+            user: None,
         }
     }
 
+    pub fn with_user(mut self, user: Arc<Mutex<UserModel>>) -> Shared {
+        self.user = Some(user);
+        self
+    }
+
     pub fn session(&self, opt: Options) -> Session {
+        let engine = Engine::new(self.lex.clone(), self.eng.clone(), opt);
         Session {
-            engine: Engine::new(self.lex.clone(), self.eng.clone(), opt),
+            engine: match &self.user {
+                Some(u) => engine.with_user(u.clone()),
+                None => engine,
+            },
         }
     }
 }

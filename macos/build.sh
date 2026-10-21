@@ -1,11 +1,24 @@
 #!/usr/bin/env bash
-# Build, ad-hoc sign and install the keyflip input method on macOS.
+# Build, sign and install the keyflip input method on macOS.
 #
-#   macos/build.sh            build and install into ~/Library/Input Methods
-#   macos/build.sh --no-install   build only (output in macos/build/)
+#   macos/build.sh                      build, sign ad hoc, install into ~/Library/Input Methods
+#   macos/build.sh --no-install         build only (output in macos/build/)
+#   macos/build.sh --sign "<identity>"  sign with a certificate and the hardened runtime
+#                                       (used by macos/release.sh; implies --no-install)
 #
 # Needs: Rust (rustup), Xcode command line tools (swiftc, codesign). No admin rights.
 set -euo pipefail
+
+INSTALL=1
+SIGN_ID=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --no-install) INSTALL=0 ;;
+    --sign) SIGN_ID="${2:?--sign needs an identity}"; INSTALL=0; shift ;;
+    *) echo "unknown option: $1" >&2; exit 2 ;;
+  esac
+  shift
+done
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
@@ -46,11 +59,16 @@ swiftc -O -swift-version 5 \
   macos/Sources/*.swift \
   -o "$APP/Contents/MacOS/Keyflip"
 
-echo "== Sign (ad hoc, local use only)"
-codesign --force --deep --sign - "$APP"
-codesign --verify --verbose "$APP"
+if [ -n "$SIGN_ID" ]; then
+  echo "== Sign ($SIGN_ID, hardened runtime)"
+  codesign --force --options runtime --timestamp --sign "$SIGN_ID" "$APP"
+else
+  echo "== Sign (ad hoc, local use only)"
+  codesign --force --sign - "$APP"
+fi
+codesign --verify --strict --verbose "$APP"
 
-if [ "${1:-}" = "--no-install" ]; then
+if [ "$INSTALL" = 0 ]; then
   echo "Built $APP"
   exit 0
 fi

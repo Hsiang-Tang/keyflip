@@ -2,6 +2,7 @@
 //! and list alternatives for one syllable.
 
 use crate::lexicon::{Entry, Lexicon};
+use crate::user::{UserModel, USER_COUNT};
 
 /// One syllable of a run: its reading and, if the user picked a character, that choice.
 #[derive(Debug, Clone)]
@@ -32,12 +33,29 @@ fn consistent_with_fixed(entry: &Entry, units: &[Unit], start: usize) -> bool {
         })
 }
 
-/// One Chinese character per unit, chosen by the best segmentation.
-pub fn convert(lex: &Lexicon, units: &[Unit]) -> Vec<String> {
+fn entries_from<'a>(
+    lex: &'a Lexicon,
+    user: Option<&'a UserModel>,
+    reading: &str,
+) -> impl Iterator<Item = &'a Entry> {
+    let phrases = user.map(|u| u.phrases_from(reading)).unwrap_or(&[]);
+    lex.entries_from(reading).iter().chain(phrases)
+}
+
+/// Cost per syllable where an entry disagrees with a learned preference.
+fn mismatch_penalty() -> f64 {
+    (USER_COUNT as f64).ln()
+}
+
+/// One Chinese character per unit, chosen by the best segmentation. Entries
+/// agreeing with learned preferences count as `USER_COUNT` (UL-3, UL-4).
+pub fn convert(lex: &Lexicon, user: Option<&UserModel>, units: &[Unit]) -> Vec<String> {
     let n = units.len();
     if n == 0 {
         return Vec::new();
     }
+    let readings: Vec<&str> = units.iter().map(|u| u.reading.as_str()).collect();
+    let prefs = user.map(|u| u.preferences(&readings)).unwrap_or_else(|| vec![None; n]);
     let mut best = vec![f64::NEG_INFINITY; n + 1];
     let mut back: Vec<Option<(usize, String)>> = vec![None; n + 1];
     best[0] = 0.0;
@@ -45,12 +63,25 @@ pub fn convert(lex: &Lexicon, units: &[Unit]) -> Vec<String> {
         if best[i] == f64::NEG_INFINITY {
             continue;
         }
-        for entry in lex.entries_from(&units[i].reading) {
+        for entry in entries_from(lex, user, &units[i].reading) {
             if !matches_at(entry, units, i) || !consistent_with_fixed(entry, units, i) {
                 continue;
             }
             let j = i + entry.readings.len();
-            let score = best[i] + lex.score(entry.count);
+            let (mut agree, mut disagree) = (0, 0);
+            for (ch, pref) in entry.text.chars().zip(&prefs[i..j]) {
+                match pref {
+                    Some(p) if *p == ch => agree += 1,
+                    Some(_) => disagree += 1,
+                    None => {}
+                }
+            }
+            let count = if agree > 0 && disagree == 0 {
+                entry.count.max(USER_COUNT)
+            } else {
+                entry.count
+            };
+            let score = best[i] + lex.score(count) - disagree as f64 * mismatch_penalty();
             if score > best[j] {
                 best[j] = score;
                 back[j] = Some((i, entry.text.clone()));
@@ -88,13 +119,28 @@ pub struct Candidate {
     pub len: usize,
 }
 
-/// Alternatives for the unit at `target`: multi-character words that start
-/// there first, then single characters, each most frequent first.
-pub fn candidates(lex: &Lexicon, units: &[Unit], target: usize) -> Vec<Candidate> {
+/// Alternatives for the unit at `target`: learned choices (UL-2), then words,
+/// then single characters, each most frequent first.
+pub fn candidates(
+    lex: &Lexicon,
+    user: Option<&UserModel>,
+    units: &[Unit],
+    target: usize,
+) -> Vec<Candidate> {
+    let mut learned = Vec::new();
     let mut words = Vec::new();
     let mut chars = Vec::new();
     let mut seen = std::collections::HashSet::new();
-    for entry in lex.entries_from(&units[target].reading) {
+    if let Some(u) = user {
+        let readings: Vec<&str> = units[target..].iter().map(|u| u.reading.as_str()).collect();
+        for (text, len) in u.learned_for(&readings) {
+            if seen.insert(text.clone()) {
+                learned.push(Candidate { text, len });
+            }
+        }
+    }
+    let phrases = user.map(|u| u.phrases_from(&units[target].reading)).unwrap_or(&[]);
+    for entry in phrases.iter().chain(lex.entries_from(&units[target].reading)) {
         if !matches_at(entry, units, target) {
             continue;
         }
@@ -111,6 +157,7 @@ pub fn candidates(lex: &Lexicon, units: &[Unit], target: usize) -> Vec<Candidate
             chars.push(cand);
         }
     }
-    words.extend(chars);
-    words
+    learned.extend(words);
+    learned.extend(chars);
+    learned
 }

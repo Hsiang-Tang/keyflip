@@ -21,9 +21,9 @@ New Zhuyin.
 - macOS shell: builds and installs on Apple Silicon and is in daily use by the
   maintainer; the full hand-test checklist is not yet complete (`macos/`,
   `crates/keyflip-ffi`).
-- Windows shell: loads and runs on real Windows, but registration needs
-  administrator rights, so typing behavior is not yet verified
-  (`crates/keyflip-tsf`, `crates/keyflip-server`).
+- Learning: picks from the candidate window, your own phrases, and English words you
+  type are remembered on this Mac (`specs/004-user-lexicon/`).
+- macOS only. The Windows shell is frozen and unmaintained (ADR-0008).
 
 Details: `docs/STATUS.md`.
 
@@ -45,7 +45,18 @@ bash macos/build.sh                # build and install into ~/Library/Input Meth
 ```
 
 Needs Rust and the Xcode command line tools. macOS needs no administrator rights.
-Full guides: `specs/002-platform-shells/macos.md` and `windows.md`.
+Full guide: `specs/002-platform-shells/macos.md`. A signed, notarized release is built
+with `macos/release.sh` (setup steps in its header).
+
+## Your dictionary
+
+The input menu has "Open User Dictionary Folder"
+(`~/Library/Application Support/keyflip/`):
+
+- `phrases.txt`: your own words, one per line as `text<Tab>readings`, for example
+  `鍵翻<Tab>ㄐㄧㄢˋ ㄈㄢ`. Picked up when you switch back to keyflip.
+- `learned.tsv` and `english.tsv`: what keyflip learned. Delete a line to forget it,
+  or use "Clear Learned Choices" (the old files are kept as `.bak`).
 
 ## Documentation map
 

@@ -12,7 +12,8 @@ Format: task, requirements covered, verification, status.
 - T-MI-4 Evaluation tool. Requirement MI-19. Verification:
   `cargo run --release -p keyflip-cli -- eval`. Status: done.
 - T-MI-5 Setting for space between Chinese and English. Requirement MI-6. Verification: new
-  acceptance case. Status: engine option exists; shell settings UI not done.
+  acceptance case. Status: engine option exists; the settings UI was dropped
+  (2026-10-21); not exposed on macOS.
 - T-MI-6 Identifier protection. Requirements MI-20, MI-21. Verification: acceptance cases
   I01 to I11 and two behavior tests. Status: done (2026-10-21) for joiners and punctuation
   width; a protected-range list in the snapshot waits for a shell that needs it.

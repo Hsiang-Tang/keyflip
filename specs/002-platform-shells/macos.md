@@ -95,7 +95,7 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 - [ ] `Hsiang`, Space, then `su3cl3` composes "Hsiang" followed by the Chinese for "hello".
 - [ ] `j9s` (ㄨㄞㄋ) then Tab then Enter gives ㄨㄞㄋ.
 - [ ] `docu` shows a small panel `document  Tab` below the caret; Tab completes
-      `document`; Enter without Tab gives `docu`.
+      `document`; Right also completes; Enter without Tab gives `docu`.
 - [ ] `1` then Enter gives ㄅ; `ai` then Tab then Enter gives `ai`; `ai` then Space
       (Chinese appears) then Tab gives `ai `.
 - [ ] Enter while composing only confirms the text, with no newline or send; a second Enter
@@ -120,6 +120,13 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 - [ ] Up while composing: the composition does not disappear.
 - [ ] A shortcut such as Cmd+C while composing: the first press confirms the text, the
       second runs the shortcut.
+- [ ] Type 慢慢 then ㄉㄜ˙ (`a04a042k7`), Down, pick 地, Enter. Typing it again gives
+      慢慢地; `su32k7` still gives 你的.
+- [ ] Type `docker` and commit it twice; then `doc` suggests `docker`.
+- [ ] The input menu shows "清除學習紀錄" and "打開使用者詞庫資料夾"; the folder holds
+      `phrases.txt`. Add `鍵翻<Tab>ㄐㄧㄢˋ ㄈㄢ`, switch away and back, and `ru04z0` then
+      Space gives 鍵翻.
+- [ ] "清除學習紀錄" forgets 地 and `docker`; `learned.tsv.bak` keeps the old file.
 
 ## Known limits
 

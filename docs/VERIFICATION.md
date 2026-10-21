@@ -221,6 +221,25 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   as a known limit in TP-8; a shell repair was drafted, never tested, and removed.
 - `cargo test --workspace` passes; evaluation output identical.
 
+### 2026-10-21 User lexicon and learning (004-user-lexicon), macOS only, release script
+
+- macOS only (ADR-0008): Windows code frozen, roadmap item 7 dropped.
+- User model (ADR-0007): behavior tests in `crates/keyflip-core/tests/user.rs` were
+  written before the code and failed first. The first conversion design boosted only
+  the learned entry; three tests kept failing because phrases such as 慢慢的 and 你的
+  outscored it, so the design moved to per-syllable preferences with a mismatch cost
+  (recorded in the plan). Tests were not changed to pass.
+- English completion learning (UL-11, maintainer request `doc` -> `docker`): the
+  behavior test failed first (`tor` instead of `ker`).
+- File layer: 5 tests in `keyflip-ffi` (template, save, corrupt copy and rewrite,
+  reload of hand edits, clear with `.bak`). On this Mac the first launch created
+  `~/Library/Application Support/keyflip/phrases.txt`.
+- Release: `macos/build.sh --sign` signs with the hardened runtime and a timestamp;
+  checked with the maintainer's Apple Development certificate, installed, and launched
+  with no errors in the system log. Releases are Apple Silicon only: this machine's
+  Rust comes from Homebrew without an x86_64 standard library. Notarization not run.
+- `cargo test --workspace` passes; clippy clean; evaluation output identical.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

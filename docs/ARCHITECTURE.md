@@ -1,24 +1,29 @@
 # keyflip architecture
 
 ```
- key ──► shell (Windows TSF / macOS IMK) ──► engine keyflip-core
-              ▲                                   │
-              └────────── full snapshot ◄─────────┘
+ key ──► shell (macOS IMK) ──► engine keyflip-core ◄── user model (in memory)
+              ▲                      │                     ▲
+              └──── full snapshot ◄──┘          keyflip-ffi loads and saves the files
 ```
+
+macOS is the only supported platform (ADR-0008); the Windows crates are frozen.
 
 ## Components
 
 - `crates/keyflip-core`: pure Rust engine. `Engine::handle_key(KeyEvent) -> Snapshot`.
   No files, windows, or system APIs. Contains the key table (`zhuyin.rs`), lexicon and
   Viterbi segmentation (`lexicon.rs`, `convert.rs`), English word list (`english.rs`),
-  and the state machine (`engine.rs`).
+  the state machine (`engine.rs`), and the user model (`user.rs`: user phrases,
+  learned choices, learned English words; no I/O).
 - `crates/keyflip-proto`: JSON protocol types between shell and engine. The `engine`
   feature is optional and on by default; the TSF DLL turns it off so the DLL carries
   no lexicon.
-- `crates/keyflip-server`: Windows engine service over a named pipe.
-- `crates/keyflip-tsf`: Windows text service DLL (thin).
-- `crates/keyflip-ffi`: C interface static library for macOS.
-- `macos/`: Swift IMK shell (thin).
+- `crates/keyflip-server`, `crates/keyflip-tsf`, `installer/`: Windows engine service
+  and text service DLL; frozen (ADR-0008).
+- `crates/keyflip-ffi`: C interface static library for macOS. Owns the user files in
+  `~/Library/Application Support/keyflip/` (ADR-0007).
+- `macos/`: Swift IMK shell (thin); `build.sh` builds and installs, `release.sh` signs,
+  notarizes, and packages.
 - `crates/keyflip-cli`: `play` simulator and `eval` evaluator.
 - `data/`: `lexicon.tsv` (6.1 MB, derived from McBopomofo), `english.txt`,
   `SOURCES.txt` and `ENGLISH_SOURCE.txt` (pinned upstream versions).
@@ -55,3 +60,6 @@ Details are in `specs/001-mixed-input/plan.md`. In short:
 - `docs/adr/0003-proto-engine-optional-feature.md`
 - `docs/adr/0004-macos-c-ffi-json.md`
 - `docs/adr/0005-windows-registration-needs-admin.md`
+- `docs/adr/0006-capslock-is-an-uppercase-lock.md`
+- `docs/adr/0007-user-data-lives-beside-the-engine.md`
+- `docs/adr/0008-macos-only.md`

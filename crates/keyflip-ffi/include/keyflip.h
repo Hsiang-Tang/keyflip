@@ -27,6 +27,16 @@ char *keyflip_handle(KeyflipSession *session, const char *request_json);
 // Frees a string returned by keyflip_handle. Passing NULL is allowed.
 void keyflip_string_free(char *s);
 
+// User files (phrases.txt, learned.tsv) in dir, created if missing. Call once,
+// before the first session. Returns 0 on success; typing works either way.
+int keyflip_user_open(const char *dir);
+
+// Re-reads user files edited by hand since they were last read.
+void keyflip_user_reload(void);
+
+// Forgets every learned choice.
+void keyflip_user_clear(void);
+
 #ifdef __cplusplus
 }
 #endif

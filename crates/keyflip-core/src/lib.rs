@@ -6,6 +6,7 @@ pub mod english;
 pub mod key;
 pub mod lexicon;
 pub mod snapshot;
+pub mod user;
 pub mod zhuyin;
 
 pub use engine::{Engine, Options};
