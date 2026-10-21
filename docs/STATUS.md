@@ -4,9 +4,9 @@ Updated: 2026-10-21.
 
 ## In one sentence
 
-The core engine is complete and passes acceptance. The macOS shell builds and
-installs (first successful build 2026-10-21) but has not been tested by hand. The
-Windows shell cannot be registered on a machine without administrator rights, so
+The core engine is complete and passes acceptance. The macOS shell builds,
+installs, and is in daily use by the maintainer; the full hand-test checklist is not
+yet complete. The repository is public (2026-10-21). The Windows shell cannot be registered on a machine without administrator rights, so
 Windows typing behavior is unverified.
 
 ## Verified
@@ -35,7 +35,8 @@ Windows typing behavior is unverified.
 
 ## Not verified
 
-- All hand typing behavior on both platforms.
+- The full macOS hand-test checklist (grid, caret position, CapsLock, MI-24,
+  completion panel), and all hand typing behavior on Windows.
 - Windows TSF registration (needs administrator rights).
 
 ## Blockers

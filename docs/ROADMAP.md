@@ -21,8 +21,8 @@ Order is priority. Each finished item gets an entry in `docs/VERIFICATION.md`.
    verify with `specs/002-platform-shells/windows.md`. Rebuild `dist/`; the current
    binaries predate the engine's Up-arrow change and are stale.
 8. Publish the repository (license work is done: `LICENSE`, `NOTICE`,
-   `THIRD_PARTY_LICENSES.md`, English list from wordfreq). Making it public is the
-   maintainer's decision.
+   `THIRD_PARTY_LICENSES.md`, English list from wordfreq). Done 2026-10-21: made
+   public by the maintainer after a full-history scan for private data.
 
 ## Version 2
 

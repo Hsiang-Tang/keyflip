@@ -18,8 +18,9 @@ New Zhuyin.
 ## Status
 
 - Core engine: complete, tests pass (`crates/keyflip-core`).
-- macOS shell: builds and installs on Apple Silicon; typing behavior not yet
-  verified by hand (`macos/`, `crates/keyflip-ffi`).
+- macOS shell: builds and installs on Apple Silicon and is in daily use by the
+  maintainer; the full hand-test checklist is not yet complete (`macos/`,
+  `crates/keyflip-ffi`).
 - Windows shell: loads and runs on real Windows, but registration needs
   administrator rights, so typing behavior is not yet verified
   (`crates/keyflip-tsf`, `crates/keyflip-server`).
