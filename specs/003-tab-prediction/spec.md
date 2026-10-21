@@ -1,7 +1,8 @@
 # Specification: Tab prediction (003-tab-prediction)
 
-Status: draft, waiting for the maintainer's choices under "Decisions". Nothing here is
-implemented. Roadmap item 9.
+Status: decisions made 2026-10-21 (both kinds; Chinese continuation accepted with Right
+at the end of the composition). Not implemented; paused by the maintainer before
+implementation. Next: write acceptance cases, then plan and tasks. Roadmap item 9.
 
 ## Goal
 
