@@ -58,7 +58,7 @@ Recovery cases
 
 English misjudgments measured by the evaluator concentrate on common one- and two-letter
 words (`i`, `up`, `ai`, `jp`) because they are also legal Zhuyin syllables. They default to
-Chinese and are recovered with Enter or Tab. Only 0.2% of the top 10,000 English words are
+Chinese and are recovered with Tab. Only 0.2% of the top 10,000 English words are
 misjudged.
 
 ## Not yet accepted (needs a human on real machines)

@@ -136,7 +136,7 @@ whose head starts with a Shift capital or cannot be Zhuyin, so `Hsiang` + 好 ke
   syllable there still needs a Space first, because Space also ends the English word.
   When the word plus an inflection is also a word (`list` + ㄋ… versus `lists`), the
   longer word wins; Tab undoes a wrong split.
-- Two-letter abbreviations (such as `jp`, `ai`) default to Chinese; recover with Enter or Tab.
+- Two-letter abbreviations (such as `jp`, `ai`) default to Chinese; recover with Tab.
 - Only the standard Zhuyin layout.
 
 ## Shell rules
