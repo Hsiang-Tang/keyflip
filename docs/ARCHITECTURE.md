@@ -38,7 +38,7 @@ Details are in `specs/001-mixed-input/plan.md`. In short:
 - Letters typed without Shift are stored as pending Zhuyin; when the sequence is no
   longer the prefix of any legal syllable it becomes English; a tone key ends a syllable.
 - Shift plus letter starts an English segment.
-- Enter commits the raw letters; Tab flips the last automatic judgment.
+- Enter commits the composition as shown; Tab flips the last automatic judgment.
 
 ## Data and licensing
 

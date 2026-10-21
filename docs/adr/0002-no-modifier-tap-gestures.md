@@ -24,3 +24,5 @@ the tap-versus-hold threshold (0.2 s, 0.3 s, or none).
 - Without a "force English" gesture, recovery relies on Enter (commit raw letters) and
   Tab (flip); misjudgments concentrate on one- and two-letter ambiguous words.
 - This promise is part of the constitution and must not be broken.
+- Update 2026-10-21: Enter now commits the composition as shown (MI-7), so Tab is the
+  one recovery key; the decision in this record is unchanged.

@@ -82,7 +82,9 @@ For each incoming key, apply in order:
 
 A judgment can always be changed:
 
-- Enter: commit the raw letters (no trailing space).
+- Enter: commit what is shown; unfinished Zhuyin leaves as its symbols (MI-7). For the
+  raw letters, Tab first. Letters in a path or URL token never become pending Zhuyin, so
+  `~/ai` commits as typed.
 - Tab (while composing): cycle between raw, English, and Zhuyin.
 
 ## Recovery and pass-through keys

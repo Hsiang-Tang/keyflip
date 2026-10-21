@@ -101,6 +101,19 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   full strength, the others dimmed, the selection highlighted.
 - Not verified: the grid during real typing; Windows draws no grid.
 
+### 2026-10-21 Enter commits what is shown (MI-7 changed)
+
+- Maintainer report from the macOS hand test: a shown ㄅ committed as `1`. The maintainer
+  chose "commit what is shown"; raw letters now need Tab first.
+- Case B02 changed from `ai<E>` = `ai` to ㄇㄛ by that decision, not to make code pass;
+  new cases B04 to B06. The behavior test for raw letters became a test for the new rule
+  plus the Tab path, and a second test covers Shift+Enter and Ctrl combos.
+- The change broke I06 (`~/ai` committed as `~／ㄇㄛ`), which exposed that letters in a
+  path were still judged as Zhuyin. MI-20 now covers path and URL tokens; cases I12 to
+  I14 added. `API/你好` (I11) still splits.
+- `cargo test --workspace` passes (38 cases). Evaluation output is identical to the
+  previous run.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

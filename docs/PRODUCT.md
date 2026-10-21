@@ -15,8 +15,8 @@ Typing needs no switching gesture:
   lowercase letters that follow join the same English word.
 - All-lowercase words such as `github` or `docker` are judged English at the point
   where the keys can no longer form a valid Zhuyin syllable.
-- A wrong judgment is fixed with one key: Enter commits the raw letters; Tab cycles
-  between raw, English, and Zhuyin.
+- A wrong judgment is fixed with one key: Tab cycles between raw, English, and
+  Zhuyin. Enter commits what the composition shows.
 
 Everything else keeps Microsoft New Zhuyin habits:
 

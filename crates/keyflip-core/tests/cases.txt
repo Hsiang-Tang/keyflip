@@ -39,7 +39,10 @@ P32	user2024<E>	user2024
 
 # --- boundary ---
 B01	<E>
-B02	ai<E>	ai
+B02	ai<E>	ㄇㄛ
+B04	1<E>	ㄅ
+B05	su3cl31<E>	你好ㄅ
+B06	su3cl3,<E>	你好,
 B03	su3cl3Hsiang_su3cl3<E>	你好Hsiang 你好
 
 # --- recovery ---
@@ -58,3 +61,6 @@ I08	<S-_>Hsiang,su3<E>	Hsiang，你
 I09	<S-_>Note:su3<E>	Note：你
 I10	<S-_>su3cl3(API)<E>	你好（API）
 I11	<S-_>API/su3cl3<E>	API／你好
+I12	~/ai/su<E>	~/ai/su
+I13	su3cl3_./ai<E>	你好./ai
+I14	https://ai.su<E>	https://ai.su

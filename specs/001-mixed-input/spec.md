@@ -41,7 +41,12 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 
 ### Recovery
 
-- MI-7 Enter while composing commits the raw letters (not Chinese) and does nothing else.
+- MI-7 Enter while composing commits the composition as shown and does nothing else.
+  Unfinished Zhuyin commits as its symbols (`1` shown as ㄅ commits ㄅ); a lone
+  punctuation key commits as that punctuation. To commit unfinished Zhuyin as the raw
+  letters, press Tab first (MI-8), then Enter. Every other commit (Shift+Enter, command
+  combos, focus loss) follows the same rule. Changed 2026-10-21 at the maintainer's
+  request: before, Enter committed raw letters, so a shown ㄅ became `1`.
 - MI-8 Tab flips the most recent automatic judgment: Zhuyin to English or English to Zhuyin.
 - MI-9 Backspace deletes one unit; after deleting an English letter the remaining key
   sequence is judged again.
@@ -78,7 +83,9 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 - MI-20 After an English word or a number, Shift+`-` (`_`) and Shift+`2` (`@`) join the
   word: they are English characters and the letters and digits after them stay English
   with no Zhuyin judgment (`my_ai`, `name@site`). With nothing English before them they
-  are ordinary punctuation.
+  are ordinary punctuation. Likewise, inside a token that starts with `~/`, `./`, or
+  `../`, or that contains `://`, letters, digits, `/`, `.`, `-`, and `'` are English
+  (`~/ai`, `https://ai.com`). A bare `/` after a word is not a path (`API/你好`).
 - MI-21 Punctuation inside a code-like token stays half-width even in full-width mode. A
   token is a run of English letters, digits, and punctuation with no space and no Chinese.
   A punctuation mark is inside the token when a letter or digit follows it in the token

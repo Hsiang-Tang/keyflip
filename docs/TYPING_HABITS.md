@@ -56,8 +56,8 @@ maintainer.
 - Platforms: Windows and macOS both. The maintainer's work Windows machine has no
   administrator rights, so TSF registration is impossible there; macOS goes first
   and is tested at home.
-- Recovery from a wrong judgment: Enter commits raw letters, Tab flips the last
-  judgment.
+- Recovery from a wrong judgment: Tab flips the last judgment. Enter commits what is
+  shown; a shown ㄅ must not become `1` (maintainer, 2026-10-21).
 
 ## Working style
 

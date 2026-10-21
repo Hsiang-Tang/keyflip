@@ -48,7 +48,8 @@ Boundary cases
 
 Recovery cases
 
-- Enter mid-typing commits the raw letters: `ai<E>` is `ai`.
+- Enter mid-typing commits what is shown: `ai<E>` is ㄇㄛ and `1<E>` is ㄅ; Tab first
+  gives the raw letters (`ai<T><E>` is `ai`).
 - Tab flips the judgment back and forth between Chinese and English.
 - Shift+Enter and Ctrl/Alt/Win combos: the first press only confirms the text while
   composing; the second passes through to the application.

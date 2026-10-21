@@ -11,8 +11,8 @@ use github in a Chinese sentence           "github" cannot form valid Zhuyin syl
 (The sentences above are shown in English; the real input is Zhuyin keystrokes
 mixed with Latin letters.)
 
-If a judgment is wrong, press Enter to commit the raw letters you typed, or press
-Tab to flip between Chinese and English. Everything else behaves like Microsoft
+If a judgment is wrong, press Tab to flip between Chinese and English. Enter commits
+exactly what the composition shows. Everything else behaves like Microsoft
 New Zhuyin.
 
 ## Status

@@ -139,9 +139,22 @@ fn tab_swaps_a_wrong_guess_in_both_directions() {
 }
 
 #[test]
-fn enter_commits_raw_letters_for_unfinished_zhuyin() {
-    assert_eq!(commit_of("ai<E>"), "ai");
-    assert_eq!(commit_of("su<E>"), "su");
+fn enter_commits_unfinished_zhuyin_as_shown_and_tab_first_gives_raw_letters() {
+    assert_eq!(commit_of("ai<E>"), "ㄇㄛ");
+    assert_eq!(commit_of("su<E>"), "ㄋㄧ");
+    assert_eq!(commit_of("ai<T><E>"), "ai");
+    assert_eq!(commit_of("su<T><E>"), "su");
+}
+
+#[test]
+fn every_commit_path_sends_unfinished_zhuyin_as_shown() {
+    let mut e = engine();
+    feed(&mut e, "1");
+    assert_eq!(feed(&mut e, "<S-E>").commit, "ㄅ");
+    let mut ctrl_c = KeyEvent::plain(KeyCode::Char('c'));
+    ctrl_c.ctrl = true;
+    feed(&mut e, "1");
+    assert_eq!(e.handle_key(ctrl_c).commit, "ㄅ");
 }
 
 #[test]

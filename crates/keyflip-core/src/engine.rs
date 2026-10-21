@@ -296,6 +296,11 @@ impl Engine {
             }
             return;
         }
+        if self.in_path() && (is_word_char(c) || c == '/') {
+            self.flush_pending();
+            self.insert(Group::latin(c));
+            return;
+        }
         if (self.in_word() && is_word_char(c)) || (self.in_number() && (c.is_ascii_digit() || c == '.')) {
             self.insert(Group::latin(c));
             return;
@@ -464,6 +469,19 @@ impl Engine {
         }
     }
 
+    /// Committing: unfinished zhuyin leaves as the symbols shown (MI-7); a
+    /// single punctuation key leaves as punctuation.
+    fn pending_to_symbols(&mut self) {
+        if self.pending_is_lone_punct() {
+            self.flush_pending();
+            return;
+        }
+        let keys = std::mem::take(&mut self.pending);
+        for c in keys {
+            self.insert(Group::latin(zhuyin::symbol_of_key(c).unwrap_or(c)));
+        }
+    }
+
     /// Pending keys that never found a tone: punctuation if it is a single
     /// punctuation key, otherwise English letters.
     fn flush_pending(&mut self) {
@@ -492,6 +510,18 @@ impl Engine {
             i -= 1;
         }
         i < self.cursor && has_letter
+    }
+
+    /// Cursor sits in a path or URL token (`~/`, `./`, `../`, or `://`), counting
+    /// keys still pending as typed. Letters there are English (MI-20).
+    fn in_path(&self) -> bool {
+        let mut start = self.cursor;
+        while start > 0 && !self.groups[start - 1].is_syllable() && self.groups[start - 1].ch != ' ' {
+            start -= 1;
+        }
+        let mut token: String = self.groups[start..self.cursor].iter().map(|g| g.ch).collect();
+        token.extend(self.pending.iter());
+        token.starts_with("~/") || token.starts_with("./") || token.starts_with("../") || token.contains("://")
     }
 
     /// Cursor sits right after a number such as `2026` or `192.168`.
@@ -719,7 +749,7 @@ impl Engine {
     }
 
     fn commit_all(&mut self, commit: &mut String) {
-        self.flush_pending();
+        self.pending_to_symbols();
         let texts = self.group_texts();
         for (i, t) in texts.iter().enumerate() {
             if self.opt.cjk_spacing && i > 0 {
