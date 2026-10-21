@@ -122,7 +122,7 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
       second runs the shortcut.
 - [x] Type 慢慢 then ㄉㄜ˙ (`a04a042k7`), Down, pick 地, Enter. Typing it again gives
       慢慢地; `su32k7` still gives 你的.
-- [ ] Type `docker` and commit it twice; then `doc` suggests `docker`.
+- [x] Type `docker` and commit it twice; then `doc` suggests `docker`.
 - [ ] (Menu items seen 2026-10-21; phrases not yet tried.) The input menu shows "清除學習紀錄" and "打開使用者詞庫資料夾"; the folder holds
       `phrases.txt`. Add `鍵翻<Tab>ㄐㄧㄢˋ ㄈㄢ`, switch away and back, and `ru04z0` then
       Space gives 鍵翻.
