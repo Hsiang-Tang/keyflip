@@ -71,9 +71,10 @@ only if daily use shows a real need.
 
 ## Shell work
 
-- macOS: draw the `suggestion` segment dimmed. Marked text styling is decided by the
-  host application and some hosts ignore colors, so the panel may need to show the
-  suggestion instead; to be checked in the hand test.
+- macOS: the suggestion is shown in the floating panel below the caret (typed part
+  dimmed, completion in full strength, then "Tab"), never in the marked text. The first
+  hand test showed a host drawing the whole marked text reversed, so a dimmed segment
+  there looked typed.
 - Windows: the segment is drawn like other composition text (underlined, not dimmed);
   unverified until a machine with administrator rights exists.
 - Older shells that do not know the segment kind would show it as normal text; the

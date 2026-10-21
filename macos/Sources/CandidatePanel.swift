@@ -43,6 +43,10 @@ final class CandidatePanel {
             ? grid(items: items, selected: selected, rowSize: pageSize)
             : list(items: items, selected: selected, pageSize: pageSize)
 
+        place(caret: caret)
+    }
+
+    private func place(caret: NSRect) {
         let size = label.fittingSize
         let frame = NSRect(x: 0, y: 0, width: max(size.width, 60), height: max(size.height, 24))
         label.frame = frame
@@ -62,6 +66,20 @@ final class CandidatePanel {
 
     func hide() {
         panel.orderOut(nil)
+    }
+
+    /// A completion Tab would accept: the typed part dimmed, the rest in full
+    /// strength, and the key that accepts it.
+    func showSuggestion(typed: String, rest: String, caret: NSRect) {
+        let text = NSMutableAttributedString()
+        text.append(cell(" \(typed)", selected: false, dim: true))
+        text.append(cell("\(rest) ", selected: false))
+        text.append(NSAttributedString(string: " Tab ", attributes: [
+            .font: NSFont.systemFont(ofSize: 11, weight: .medium),
+            .foregroundColor: NSColor.secondaryLabelColor,
+        ]))
+        label.attributedStringValue = text
+        place(caret: caret)
     }
 
     private func cell(_ string: String, selected: Bool, dim: Bool = false) -> NSAttributedString {

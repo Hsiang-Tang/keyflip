@@ -144,6 +144,20 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   (the shorter base wins over the more frequent `documents`).
 - macOS build installed; dimmed drawing not yet seen in real hosts.
 
+### 2026-10-21 macOS hand test feedback: suggestion display and panel position
+
+- Hand test: the host drew the whole marked text reversed, so the dimmed suggestion
+  looked typed. The suggestion now leaves the marked text and appears in the panel
+  (`doc` dimmed, `tor` strong, "Tab"); rendered with the panel code on its own and
+  inspected.
+- Hand test: the candidate window opened far from the text. The shell passed the
+  document offset of the marked range to `attributes(forCharacterIndex:)`, which IMK
+  reads as an offset into the marked text. It now passes the cursor inside the
+  composition, then 0. Waiting for the next hand test.
+- Hand test: the menu icon had not changed. Text Input Sources reports
+  `MenuIcon.pdf` for both the input method and its mode, so the bundle is right and the
+  menu agent was showing a cached icon; `TextInputMenuAgent` was restarted.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

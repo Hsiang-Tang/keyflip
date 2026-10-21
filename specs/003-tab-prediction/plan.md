@@ -13,5 +13,6 @@
   Commits are built from the composition groups, so the segment can never be committed
   (TP-3).
 - Tab checks for a suggestion before its other meanings (TP-2).
-- macOS draws the segment in the tertiary label color without underline; Windows draws
-  it like other composition text.
+- macOS leaves the segment out of the marked text and shows it in the candidate panel,
+  because hosts style marked text themselves; Windows draws it like other composition
+  text.

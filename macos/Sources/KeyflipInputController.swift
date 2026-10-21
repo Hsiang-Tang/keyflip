@@ -59,7 +59,12 @@ final class KeyflipInputController: IMKInputController {
             client.insertText(state.commit, replacementRange: anywhere)
         }
 
-        if state.preedit.isEmpty {
+        // The suggestion never enters the marked text: hosts draw marked text
+        // with their own style (some reverse it), so it would look typed.
+        let typed = state.preedit.filter { $0.kind != "suggestion" }
+        let suggestion = state.preedit.first { $0.kind == "suggestion" }?.text
+
+        if typed.isEmpty {
             if composing {
                 client.setMarkedText("", selectionRange: NSRange(location: 0, length: 0), replacementRange: anywhere)
             }
@@ -67,29 +72,33 @@ final class KeyflipInputController: IMKInputController {
         } else {
             composing = true
             client.setMarkedText(
-                markedText(for: state.preedit),
+                markedText(for: typed),
                 selectionRange: NSRange(location: state.cursor, length: 0),
                 replacementRange: anywhere
             )
         }
 
         if let items = state.candidates {
-            let caret = caretRect(of: client)
             CandidatePanel.shared.show(
                 items: items, selected: state.selected, pageSize: state.pageSize,
-                expanded: state.expanded, caret: caret
+                expanded: state.expanded, caret: caretRect(of: client, cursor: state.cursor)
+            )
+        } else if let rest = suggestion {
+            let text = typed.map(\.text).joined()
+            let word = String(text.reversed().prefix { $0.isASCII && $0.isLetter }.reversed())
+            CandidatePanel.shared.showSuggestion(
+                typed: word, rest: rest, caret: caretRect(of: client, cursor: state.cursor)
             )
         } else {
             CandidatePanel.shared.hide()
         }
     }
 
-    /// The caret line in screen coordinates. Some hosts report an empty
-    /// rectangle for index 0, so try the marked range, then the selection,
-    /// then fall back to the mouse position.
-    private func caretRect(of client: IMKTextInput) -> NSRect {
-        let indexes = [client.markedRange().location, client.selectedRange().location]
-        for index in indexes where index != NSNotFound {
+    /// The caret line in screen coordinates. IMK reads the index as an offset
+    /// into the marked text, not into the document, so pass the cursor inside
+    /// the composition, then its start; fall back to the mouse position.
+    private func caretRect(of client: IMKTextInput, cursor: Int) -> NSRect {
+        for index in [max(cursor, 0), 0] {
             var rect = NSRect.zero
             _ = client.attributes(forCharacterIndex: index, lineHeightRectangle: &rect)
             if rect.width > 0 || rect.height > 0 { return rect }
