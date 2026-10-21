@@ -80,8 +80,9 @@ Then remove "keyflip Zhuyin" in System Settings and log out and back in.
   engine swallows useless keys such as Up).
 - When the input method is switched away or the application asks to commit, the shell sends
   `flush` to the engine and the composition text is committed.
-- Password fields: in secure input mode macOS does not hand keys to third-party input
-  methods, so the shell does nothing special.
+- Password fields (PS-7): when `IsSecureEventInputEnabled()` is true the shell passes
+  every key through and drops the composition. macOS does not keep input methods out of
+  every secure field by itself; the keychain prompt delivered keys to keyflip.
 - The candidate window is a small self-drawn floating window that does not steal focus. It
   sits below the cursor line, or above when there is no room.
 
@@ -116,7 +117,8 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 - [ ] Test once each in Safari text fields, Chrome, VS Code (editor and terminal), a chat
       app, Notes, and Terminal.
 - [ ] Switching to another input method or window commits the composing text with no loss.
-- [ ] In a password field the input method does not intervene.
+- [ ] In a password field, including the keychain password prompt, letters, digits, and
+      Shift letters type exactly as on the ABC keyboard; nothing is learned.
 - [ ] Up while composing: the composition does not disappear.
 - [ ] A shortcut such as Cmd+C while composing: the first press confirms the text, the
       second runs the shortcut.

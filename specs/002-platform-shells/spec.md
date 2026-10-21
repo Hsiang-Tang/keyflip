@@ -19,8 +19,13 @@ engine and shell.
 - PS-6 When the input method is switched away, loses focus, or the application asks to
   commit, the shell sends `flush` to the engine and the composition text is committed, not
   lost.
-- PS-7 Password fields: Windows sends no keys and records nothing; on macOS the system never
-  hands keys to third-party input methods in secure input mode.
+- PS-7 Password fields: Windows sends no keys and records nothing. On macOS, whenever
+  secure event input is on (password fields, the keychain prompt, Terminal's Secure
+  Keyboard Entry), the shell passes every key through untouched, discards any
+  composition without committing it, and never reaches the engine, so nothing is
+  learned. The system does not do this by itself: on 2026-10-21 the keychain password
+  prompt delivered keys to keyflip, digits after a Shift word stayed in the
+  composition, and the field refused them.
 - PS-8 The candidate window is a self-drawn floating window that does not steal focus. It sits
   below the cursor line, or above when there is no room; there is a fallback when the cursor
   coordinates are unavailable.

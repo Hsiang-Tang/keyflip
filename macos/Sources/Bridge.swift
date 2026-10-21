@@ -82,4 +82,9 @@ final class EngineSession {
     func flush() -> EngineState? {
         send(["op": "flush"])
     }
+
+    /// Drops the composition without committing it.
+    func reset() {
+        _ = send(["op": "reset"])
+    }
 }

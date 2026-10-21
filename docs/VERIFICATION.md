@@ -243,6 +243,23 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   learned and comes back; after `docker` was typed twice, `doc` suggests `docker`. Not
   yet tried by hand: user phrases, clear.
 
+### 2026-10-21 Password fields on macOS (PS-7) and the first notarized build
+
+- Maintainer report: in the keychain password prompt, Shift letters typed but digits
+  after them did not. The system log showed keyflip receiving the keys (marked text set
+  and committed), so the guide's claim that macOS keeps input methods out of secure
+  fields was wrong. The learned files were also written while the password was typed;
+  every English word seen only once was deleted without reading it, keeping only the
+  word the maintainer tested (`docker`).
+- Fix: when `IsSecureEventInputEnabled()` is true the shell passes every key through,
+  discards the composition without committing, and never reaches the engine.
+  Shell-only; no engine test applies. After the fix the keychain prompt accepted the
+  password and Developer ID signing succeeded.
+- `macos/release.sh`: notarization accepted, ticket stapled, `spctl` reports
+  "Notarized Developer ID". Output `dist/keyflip-0.1.0-macos-arm64.zip`
+  (sha256 ca27e6b464dbc8f9ebec3de9779a5441dfc8848d1e64924a3e0e68560e2c6470). The
+  notary profile uses the existing App Store Connect API key.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

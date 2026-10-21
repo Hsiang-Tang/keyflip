@@ -48,6 +48,16 @@ Needs Rust and the Xcode command line tools. macOS needs no administrator rights
 Full guide: `specs/002-platform-shells/macos.md`. A signed, notarized release is built
 with `macos/release.sh` (setup steps in its header).
 
+## Install a release
+
+1. Download `keyflip-<version>-macos-arm64.zip` from the GitHub releases page (Apple
+   Silicon, macOS 12 or later) and unzip it.
+2. Move `Keyflip.app` into `~/Library/Input Methods` (in Finder: Go > Go to Folder).
+3. Log out and back in, then add it in System Settings > Keyboard > Text Input >
+   Input Sources > Edit > + > Chinese, Traditional > keyflip 注音.
+4. Turn off "Use the Caps Lock key to switch to and from ABC" in the same place, so
+   CapsLock types capitals.
+
 ## Your dictionary
 
 The input menu has "Open User Dictionary Folder"

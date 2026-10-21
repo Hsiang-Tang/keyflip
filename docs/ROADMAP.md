@@ -31,9 +31,7 @@ macOS is the only supported platform (ADR-0008).
 10. User lexicon and learning: done 2026-10-21 (`specs/004-user-lexicon/`, ADR-0007).
     Learned picks, user phrases, and English completion learned from typing; hand test
     pending.
-11. Signing and notarization: `macos/release.sh` done 2026-10-21 (Apple Silicon zip).
-    Waiting for the maintainer's one-time setup: a Developer ID Application
-    certificate and a `notarytool` keychain profile (steps in the script header).
+11. Signing and notarization: done 2026-10-21 (`macos/release.sh`, Apple Silicon zip).
 12. First public release: run `macos/release.sh`, attach the zip to a GitHub release,
     and add install steps for people who do not build from source.
 

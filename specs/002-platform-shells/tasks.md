@@ -22,6 +22,5 @@
 - T-PS-9 Settings UI (Chinese/English spacing, full-width default). Status: dropped
   (2026-10-21, see `docs/ROADMAP.md`).
 - T-PS-10 Signed and notarized macOS release. Verification: `macos/release.sh` produces
-  a stapled zip that `spctl` accepts. Status: script done; hardened-runtime signing
-  checked with a development certificate (2026-10-21). Notarization waits for a
-  Developer ID certificate and a notary profile, which only the maintainer can create.
+  a stapled zip that `spctl` accepts. Status: done (2026-10-21); first notarized build
+  `keyflip-0.1.0-macos-arm64.zip`.

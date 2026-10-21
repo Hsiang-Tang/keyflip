@@ -1,3 +1,4 @@
+import Carbon
 import Cocoa
 import InputMethodKit
 import os
@@ -35,6 +36,10 @@ final class KeyflipInputController: IMKInputController {
         guard let event = event, event.type == .keyDown,
               let client = sender as? IMKTextInput
         else { return false }
+        if IsSecureEventInputEnabled() {
+            discardComposition(client)
+            return false
+        }
         // Keys the map does not know (function keys, Page Up/Down) must not
         // reach the host while composing, or it may clear the marked text.
         guard let request = KeyMap.request(for: event) else { return composing }
@@ -50,10 +55,13 @@ final class KeyflipInputController: IMKInputController {
     }
 
     override func commitComposition(_ sender: Any!) {
-        // The host asked for the composition to be committed (focus change, or
-        // a page rewriting its field while text is marked).
         log.notice("host commit, composing=\(self.composing, privacy: .public)")
-        guard let client = sender as? IMKTextInput, let state = session.flush() else { return }
+        guard let client = sender as? IMKTextInput else { return }
+        if IsSecureEventInputEnabled() {
+            discardComposition(client)
+            return
+        }
+        guard let state = session.flush() else { return }
         apply(state, to: client)
     }
 
@@ -92,6 +100,17 @@ final class KeyflipInputController: IMKInputController {
         commitComposition(sender)
         CandidatePanel.shared.hide()
         super.deactivateServer(sender)
+    }
+
+    /// Password fields get no keys and nothing is committed or learned (PS-7).
+    private func discardComposition(_ client: IMKTextInput) {
+        if composing {
+            session.reset()
+            client.setMarkedText("", selectionRange: NSRange(location: 0, length: 0),
+                                 replacementRange: NSRange(location: NSNotFound, length: NSNotFound))
+            composing = false
+        }
+        CandidatePanel.shared.hide()
     }
 
     // MARK: drawing
