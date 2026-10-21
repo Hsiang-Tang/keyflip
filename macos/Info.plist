@@ -32,6 +32,8 @@
     <string>KeyflipInputController</string>
     <key>TISInputSourceID</key>
     <string>com.hsiangtang.inputmethod.keyflip</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>tsInputMethodIconFileKey</key>
     <string>MenuIcon.pdf</string>
     <key>TISIconIsTemplate</key>

@@ -198,6 +198,26 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   correctly wins).
 - `cargo test --workspace` and the builder tests pass; evaluation output identical.
 
+### 2026-10-21 Right arrow accepts a completion (TP-8) and switcher icon
+
+- Maintainer report: in the YouTube Music search box, Tab after `complicat` committed
+  `complicat` instead of completing. A shell log showed the engine accepted the
+  suggestion, then the host asked for a commit 9 ms later. A browser test page logging
+  key and composition events showed the page receives `keydown key=Tab` (code 229)
+  before the composition update; a plain input and Notes complete correctly, so that
+  page acts on Tab during composition. keyflip cannot hide the key from the page.
+- Fix: Right arrow accepts a shown suggestion like Tab (TP-8). The behavior test failed
+  before the change. Its first draft compared the whole preedit, which includes the
+  suggestion segment; it was corrected to compare only typed text (a test bug, not a
+  loosened expectation).
+- The macOS shell now logs (event names only, no text) when the host asks for a commit:
+  `log show --predicate 'subsystem == "com.hsiangtang.inputmethod.keyflip"'`.
+- The input source switcher (Control+Space) showed the system's generic icon: it reads
+  the app icon, which did not exist. `macos/make-icon.swift` now also draws
+  `AppIcon.icns` (the same arrows on a light rounded square); `CFBundleIconFile` added.
+  The menu bar icon is unchanged. Not yet seen in the switcher (icon cache).
+- `cargo test --workspace` passes; evaluation output identical.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

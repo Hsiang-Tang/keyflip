@@ -171,6 +171,17 @@ impl Engine {
 
     // ---- dispatch ----
 
+    /// Appends the shown suggestion as typed text (TP-2, TP-8). False if none.
+    fn accept_suggestion(&mut self) -> bool {
+        let Some(rest) = self.suggestion() else {
+            return false;
+        };
+        for c in rest.chars() {
+            self.insert(Group::latin(c));
+        }
+        true
+    }
+
     fn dispatch(&mut self, ev: KeyEvent, commit: &mut String) -> bool {
         if ev.code != KeyCode::Tab {
             self.flip = None;
@@ -198,10 +209,7 @@ impl Engine {
                 if !self.is_composing() {
                     return false;
                 }
-                if let Some(rest) = self.suggestion() {
-                    for c in rest.chars() {
-                        self.insert(Group::latin(c));
-                    }
+                if self.accept_suggestion() {
                     return true;
                 }
                 if !self.pending.is_empty() {
@@ -246,7 +254,10 @@ impl Engine {
                 }
             }
             KeyCode::Left => self.move_cursor(|c, _| c.saturating_sub(1)),
-            KeyCode::Right => self.move_cursor(|c, n| (c + 1).min(n)),
+            // A suggestion only shows at the end, where Right has nothing to do (TP-8).
+            KeyCode::Right => {
+                self.accept_suggestion() || self.move_cursor(|c, n| (c + 1).min(n))
+            }
             KeyCode::Home => self.move_cursor(|_, _| 0),
             KeyCode::End => self.move_cursor(|_, n| n),
             // Swallowed while composing: some hosts (macOS IMK) clear the

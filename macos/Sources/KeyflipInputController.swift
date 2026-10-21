@@ -1,5 +1,9 @@
 import Cocoa
 import InputMethodKit
+import os
+
+/// Event names only, never typed text (password fields must leave no record).
+private let log = Logger(subsystem: "com.hsiangtang.inputmethod.keyflip", category: "shell")
 
 /// The thin macOS shell. It never decides anything about Chinese versus
 /// English: it forwards key presses to the engine and draws what comes back.
@@ -40,6 +44,9 @@ final class KeyflipInputController: IMKInputController {
     }
 
     override func commitComposition(_ sender: Any!) {
+        // The host asked for the composition to be committed (focus change, or
+        // a page rewriting its field while text is marked).
+        log.notice("host commit, composing=\(self.composing, privacy: .public)")
         guard let client = sender as? IMKTextInput, let state = session.flush() else { return }
         apply(state, to: client)
     }

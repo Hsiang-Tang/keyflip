@@ -58,6 +58,14 @@ only if daily use shows a real need.
 - TP-6 No suggestion inside a path, URL, or identifier token (MI-20, MI-21).
 - TP-7 No learning, no history, no disk or network access. A user lexicon remains a
   separate roadmap item (10) with its own decision record.
+- TP-8 Right arrow while a suggestion is shown accepts it exactly like Tab. A suggestion
+  is shown only with the cursor at the end, where Right otherwise does nothing, so no
+  existing meaning changes; with a candidate window open, Right keeps MI-22. Reason:
+  some web pages act on the Tab key themselves even while text is being composed. The
+  browser delivers the key to the page before the completed text, and the page commits
+  the old composition (seen in the YouTube Music search box, 2026-10-21; a plain input
+  and Notes work). Pages rarely act on Right, and shells accept suggestions with it
+  (fish, zsh-autosuggestions).
 
 ## Acceptance cases
 
@@ -68,6 +76,7 @@ only if daily use shows a real need.
 - `su3cl3`: no English suggestion; Tab still flips the last syllable.
 - `~/doc`: no suggestion inside a path.
 - Idle Tab still passes through to the application.
+- `docu`, Right, Enter commits `document`; `docu`, Left, Right moves the cursor only.
 
 ## Shell work
 

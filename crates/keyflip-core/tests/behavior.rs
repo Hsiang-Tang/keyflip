@@ -325,3 +325,21 @@ fn rare_characters_never_outrank_common_ones_on_a_frequency_tie() {
     assert!(common < 9, "犮 on page 1: {items:?}");
     assert!(common < rare, "坺 at {common}, 㧊 at {rare}: {items:?}");
 }
+
+#[test]
+fn right_arrow_accepts_the_completion_like_tab() {
+    assert_eq!(commit_of("docu<R><E>"), "document");
+    assert_eq!(commit_of("docu<R>s<E>"), "documents");
+    // Away from the end there is no suggestion, so Right only moves the cursor.
+    let mut e = engine();
+    let snap = feed(&mut e, "docu<L><R>");
+    let typed: String = snap
+        .preedit
+        .iter()
+        .filter(|s| s.kind != keyflip_core::SegKind::Suggestion)
+        .map(|s| s.text.as_str())
+        .collect();
+    assert_eq!(typed, "docu");
+    assert_eq!(snap.cursor, 4);
+    assert_eq!(suggestion(&snap).as_deref(), Some("ment"));
+}

@@ -11,7 +11,7 @@ Windows typing behavior is unverified.
 
 ## Verified
 
-- Core: 54 acceptance cases, 31 behavior tests, 6 protocol tests, 2 C-interface
+- Core: 54 acceptance cases, 32 behavior tests, 6 protocol tests, 2 C-interface
   tests; `cargo test --workspace` passes.
 - Identifier protection (MI-20, MI-21): `_` and `@` keep an English word going, and
   URLs, paths, and identifiers keep half-width punctuation in full-width mode.
