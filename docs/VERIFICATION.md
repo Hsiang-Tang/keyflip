@@ -259,6 +259,7 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   "Notarized Developer ID". Output `dist/keyflip-0.1.0-macos-arm64.zip`
   (sha256 ca27e6b464dbc8f9ebec3de9779a5441dfc8848d1e64924a3e0e68560e2c6470). The
   notary profile uses the existing App Store Connect API key.
+- Published as GitHub release `v0.1.0`; the downloaded asset has the same sha256.
 
 ### Not verified
 

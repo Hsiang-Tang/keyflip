@@ -6,8 +6,8 @@ Updated: 2026-10-21.
 
 The engine and the macOS shell are complete and in daily use by the maintainer; the
 repository is public. macOS is the only supported platform (ADR-0008). Learning
-(004-user-lexicon) is hand-tested for picks and English completion. The first signed
-and notarized build exists; publishing it is the next step.
+(004-user-lexicon) is hand-tested for picks and English completion. Release `v0.1.0`
+(signed, notarized) is published on GitHub.
 
 ## Verified
 
@@ -46,7 +46,6 @@ and notarized build exists; publishing it is the next step.
 ## Next action
 
 1. Maintainer: walk the new checklist items in `specs/002-platform-shells/macos.md`.
-2. Publish the notarized zip as a GitHub release (roadmap item 12).
 3. Fix every failure: if it is a judgment problem, add an acceptance case first.
 
 ## Working notes
