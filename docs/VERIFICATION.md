@@ -239,6 +239,9 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   with no errors in the system log. Releases are Apple Silicon only: this machine's
   Rust comes from Homebrew without an x86_64 standard library. Notarization not run.
 - `cargo test --workspace` passes; clippy clean; evaluation output identical.
+- Hand test (maintainer): the input menu shows both items; picking 地 after 慢慢 is
+  learned and comes back. Not yet tried by hand: English completion learning, user
+  phrases, clear.
 
 ### Not verified
 

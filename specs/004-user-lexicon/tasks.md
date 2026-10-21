@@ -10,4 +10,5 @@
   Verification: behavior test `typed_english_words_become_completions`, store tests.
   Status: done (2026-10-21).
 - T-UL-3 macOS menu and activation reload. Requirements UL-6, UL-9. Verification: hand
-  test in `specs/002-platform-shells/macos.md`. Status: built; hand test pending.
+  test in `specs/002-platform-shells/macos.md`. Status: menu and learned picks hand-tested (2026-10-21);
+  phrases and clear not yet tried by hand.
