@@ -15,6 +15,37 @@ If a judgment is wrong, press Tab to flip between Chinese and English. Enter com
 exactly what the composition shows. Everything else behaves like Microsoft
 New Zhuyin.
 
+## Demo
+
+Real output of the core simulator, `keyflip-cli play '<keys>'` (`<E>` is Enter,
+`<T>` is Tab):
+
+```
+keys                   committed
+su3cl3Hsiang<E>        你好Hsiang      Zhuyin, then an English name
+githubji3<E>           github我        English, then Chinese with no space
+Hsiang_su3cl3<E>       Hsiang 你好     Space ends the English word
+ai<E>                  ㄇㄛ            "ai" is also valid Zhuyin, so Chinese wins
+ai<T><E>               ai              one Tab flips it to English
+su3cl3_./ai<E>         你好./ai        paths keep half-width punctuation
+```
+
+## Accuracy
+
+Measured on 2026-10-24 with `cargo run --release -p keyflip-cli -- eval` (local
+run, no user model):
+
+| Set | Size | Result |
+| --- | --- | --- |
+| Chinese phrases | 4,940 | 0 leaked into English; 89.2% exact characters |
+| Chinese + English + Chinese, spaced | 2,858 sentences | 0 wrong |
+| Chinese + English + Chinese, glued | 1,682 sentences | 17 wrong (1.0%) |
+| English words, ranks 0 to 10,000 | 10,000 | 21 misjudged (0.2%) |
+| English + digit tokens | 2,925 | 8 changed (0.3%) |
+
+`cargo test --workspace` passes the same day: 83 tests, one of which runs all 54
+acceptance cases.
+
 ## Status
 
 - Core engine: complete, tests pass (`crates/keyflip-core`).
@@ -75,6 +106,21 @@ The input menu has "Open User Dictionary Folder"
 - `.specify/memory/constitution.md`: project principles.
 - `specs/`: specifications, plans, tasks, acceptance cases, research.
 - `docs/`: product, architecture, roadmap, status, verification log, ADRs.
+
+## How this was built
+
+The maintainer defined the problem, the judgment rules, and every acceptance case
+(`specs/001-mixed-input/acceptance.md`), and tests each build by typing on it daily.
+AI coding agents wrote the implementation under spec-driven development: a behavior
+change starts as a requirement and an acceptance case, then code; decisions are
+recorded in `docs/adr/`. Correctness is checked by the acceptance cases, the test
+suite, and the evaluation set above, all run locally.
+
+The hard part is that Zhuyin keys are Latin letters: `ai` is both an English word
+and the syllable ㄇㄛ. Chinese typed right after an English word with no space
+(MI-23) was wrong in every case at first; it is now 1.0% wrong. Fixed product
+rules keep the scope honest: no modifier-tap gestures (ADR-0002), judgment only in
+the engine (ADR-0001), macOS only (ADR-0008).
 
 ## License and data sources
 

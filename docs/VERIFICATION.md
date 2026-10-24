@@ -276,6 +276,14 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   "Notarized Developer ID". `dist/keyflip-0.1.1-macos-arm64.zip`
   (sha256 008ef8b69859f474f76e40bc62419762f2ffa9300ab49645dceaab76b8c7881d).
 
+### 2026-10-24 README demo and accuracy table
+
+- Documentation only. `cargo test --workspace` passes (83 tests). `keyflip-cli eval`:
+  4,940 Chinese phrases with 0 leaked (89.2% exact); 2,858 spaced mixed sentences with
+  0 wrong; 1,682 glued sentences with 17 wrong (1.0%); 21 of 10,000 English words
+  misjudged; 8 of 2,925 English + digit tokens changed. The README demo is real
+  `keyflip-cli play` output.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate
