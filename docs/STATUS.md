@@ -6,7 +6,7 @@ Updated: 2026-10-24.
 
 The engine and the macOS shell are complete and in daily use by the maintainer; the
 repository is public. macOS is the only supported platform (ADR-0008). Learning
-(004-user-lexicon) is hand-tested for picks and English completion. Release `v0.1.0`
+(004-user-lexicon) is hand-tested for picks and English completion. Release `v0.1.1`
 (signed, notarized) is published on GitHub.
 
 ## Verified
@@ -32,7 +32,7 @@ repository is public. macOS is the only supported platform (ADR-0008). Learning
   English words misjudged (0.2%). Evaluation runs without a user model.
 - Password fields (PS-7): keys pass through under secure input; the keychain prompt
   accepted the password after the fix.
-- Release: Developer ID signed, notarized, stapled (`dist/keyflip-0.1.0-macos-arm64.zip`).
+- Release: Developer ID signed, notarized, stapled (`dist/keyflip-0.1.1-macos-arm64.zip`).
 
 ## Not verified
 

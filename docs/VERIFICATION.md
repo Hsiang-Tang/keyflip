@@ -272,6 +272,9 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   `short_words_flipped_with_tab_stay_english`, model test
   `short_words_round_trip_and_are_capped`, store test extended). `keyflip-cli eval`
   unchanged from the previous baseline. `cargo clippy --workspace` clean.
+- Released as `v0.1.1` (build 2): notarization accepted, ticket stapled, `spctl` reports
+  "Notarized Developer ID". `dist/keyflip-0.1.1-macos-arm64.zip`
+  (sha256 008ef8b69859f474f76e40bc62419762f2ffa9300ab49645dceaab76b8c7881d).
 
 ### Not verified
 
