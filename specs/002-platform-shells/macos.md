@@ -128,6 +128,8 @@ Standard: each item must match `specs/001-mixed-input/acceptance.md`.
 - [ ] (Menu items seen 2026-10-21; phrases not yet tried.) The input menu shows "清除學習紀錄" and "打開使用者詞庫資料夾"; the folder holds
       `phrases.txt`. Add `鍵翻<Tab>ㄐㄧㄢˋ ㄈㄢ`, switch away and back, and `ru04z0` then
       Space gives 鍵翻.
+- [ ] Type `ai`, Tab, Enter once; then `ai` shows as letters and Enter sends `ai`;
+  `ai3` still gives 抹.
 - [ ] "清除學習紀錄" forgets 地 and `docker`; `learned.tsv.bak` keeps the old file.
 
 ## Known limits

@@ -33,6 +33,10 @@
   unwanted character and outscored a single boosted 地.
 - English completion (UL-11): the engine asks the user model before the word list.
   Words are counted at commit; a word needs two uses before it is suggested.
+- Short words (UL-13): Tab on pending keys marks the letters it produces as kept; a
+  standalone all-kept run of 2 to 4 letters is recorded at commit. While the pending
+  keys spell a recorded word, the snapshot shows the letters and a commit or Space
+  emits them, but the keys stay pending so a tone key still completes the syllable.
 - Candidates: learned texts for the exact span first (most recent first), then user
   phrases, then the lexicon order.
 
@@ -43,7 +47,7 @@
 - `phrases.txt`: written by the maintainer; created with a header on first run.
 - `learned.tsv`: `readings<TAB>text<TAB>context<TAB>count<TAB>sequence`, and
   `english.tsv`: `word<TAB>count<TAB>sequence`, written by keyflip after each commit
-  that learned something.
+  that learned something. `short-english.tsv`: `word<TAB>sequence` (UL-13, UL-14).
 
 Saving writes a `.tmp` file, then renames it. Loading a written file with malformed
 lines copies it to `.corrupt` first. Clearing copies both written files to `.bak`.

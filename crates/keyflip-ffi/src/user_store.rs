@@ -1,5 +1,5 @@
 //! User files (004-user-lexicon). `phrases.txt` is written by the user;
-//! `learned.tsv` and `english.tsv` are written here. The engine only sees the
+//! `learned.tsv`, `english.tsv`, and `short-english.tsv` are written here. The engine only sees the
 //! in-memory model (UL-10).
 
 use std::collections::HashMap;
@@ -14,13 +14,15 @@ use keyflip_core::user::{UserModel, PHRASES_HEADER};
 pub const PHRASES: &str = "phrases.txt";
 pub const LEARNED: &str = "learned.tsv";
 pub const ENGLISH: &str = "english.tsv";
+pub const SHORT: &str = "short-english.tsv";
 
 /// Files keyflip writes: name, loader (returns malformed lines), serializer.
 type Load = fn(&mut UserModel, &str) -> usize;
 type Dump = fn(&UserModel) -> String;
-const WRITTEN: [(&str, Load, Dump); 2] = [
+const WRITTEN: [(&str, Load, Dump); 3] = [
     (LEARNED, UserModel::load_learned, UserModel::learned_tsv),
     (ENGLISH, UserModel::load_english, UserModel::english_tsv),
+    (SHORT, UserModel::load_short, UserModel::short_tsv),
 ];
 
 pub struct UserStore {
@@ -205,14 +207,18 @@ mod tests {
 
         store.model.lock().unwrap().learn(&rs("ㄉㄜ˙"), "地", "");
         store.model.lock().unwrap().learn_word("docker");
+        store.model.lock().unwrap().learn_short("ai");
         store.save_if_changed();
         assert!(fs::read_to_string(dir.join(ENGLISH)).unwrap().contains("docker\t1\t"));
+        assert!(fs::read_to_string(dir.join(SHORT)).unwrap().contains("ai\t"));
         store.clear();
         assert_eq!(store.model.lock().unwrap().learned_len(), 0);
         let saved = fs::read_to_string(dir.join(LEARNED)).unwrap();
         assert!(!saved.contains('地'));
         let backup = fs::read_to_string(dir.join("learned.tsv.bak")).unwrap();
         assert!(dir.join("english.tsv.bak").exists());
+        assert!(dir.join("short-english.tsv.bak").exists());
+        assert_eq!(store.model.lock().unwrap().short_len(), 0);
         assert!(backup.contains('地'), "a clear can be undone by hand");
         let _ = fs::remove_dir_all(&dir);
     }

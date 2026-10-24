@@ -124,7 +124,8 @@ Each requirement maps to an acceptance case or test; see `tasks.md`.
 ## Open questions
 
 - Two-letter abbreviations (`ai`, `jp`, `up`, `i`) are judged Chinese by default and
-  recovered with Tab. Whether to improve this is left to real usage data.
+  recovered with Tab. Once flipped with Tab, a word of 2 to 4 letters stays English
+  (004-user-lexicon UL-13).
 - Identifier protection covers joiners and punctuation width (MI-20, MI-21). Splitting a
   token into protected ranges for the shell (KnowType's range list) waits for a shell
   that needs it.

@@ -1,6 +1,6 @@
 # Current status
 
-Updated: 2026-10-21.
+Updated: 2026-10-24.
 
 ## In one sentence
 
@@ -11,7 +11,7 @@ repository is public. macOS is the only supported platform (ADR-0008). Learning
 
 ## Verified
 
-- Core: 54 acceptance cases, 32 behavior tests, 8 user-model behavior tests, 5 user
+- Core: 54 acceptance cases, 32 behavior tests, 9 user-model behavior tests, 6 user
   model unit tests, 6 protocol tests, 5 C-interface tests; `cargo test --workspace`
   passes.
 - Identifier protection (MI-20, MI-21): `_` and `@` keep an English word going, and
@@ -24,8 +24,9 @@ repository is public. macOS is the only supported platform (ADR-0008). Learning
 - Candidate order: common (Big5) characters come before rare ones on a frequency tie
   (MI-10).
 - Expanded candidate grid (MI-22).
-- User lexicon (UL-1 to UL-12): learned picks, user phrases, English completion learned
-  from typing, plain-text files with corrupt-file recovery; engine and file tests pass.
+- User lexicon (UL-1 to UL-14): learned picks, user phrases, English completion learned
+  from typing, short words kept as English after a Tab flip (`ai`), plain-text files
+  with corrupt-file recovery; engine and file tests pass.
 - Evaluation: 4,940 Chinese phrases with 0 leaking into English (89.2% exactly
   correct); 2,858 Chinese-English-Chinese sentences with 0 errors; 21 of 10,000
   English words misjudged (0.2%). Evaluation runs without a user model.

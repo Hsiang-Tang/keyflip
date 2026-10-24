@@ -1,6 +1,7 @@
 # Specification: user lexicon and learning (004-user-lexicon)
 
-Status: implemented 2026-10-21; macOS hand test pending. Roadmap item 10.
+Status: implemented 2026-10-21 (UL-13, UL-14 on 2026-10-24); macOS hand test
+pending. Roadmap item 10.
 Decision record: `docs/adr/0007-user-data-lives-beside-the-engine.md`.
 
 ## Goal
@@ -55,6 +56,17 @@ Microsoft New Zhuyin learns the same way (constitution principle 7).
   with the same robustness rules as UL-7. "Clear learned choices" clears it too. The
   file lists every qualifying word typed at least once outside password fields,
   including in terminals.
+- UL-13 Short words kept as English (maintainer request: `ai` followed by Enter sent
+  ㄇㄛ). When the pending keys of a run of 2 to 4 lowercase letters are turned into
+  English with Tab and the run is committed standing alone (UL-11 glue rules), the
+  word is recorded. Later, while the pending keys spell exactly that word, the
+  composition shows the letters instead of zhuyin symbols, so Enter (MI-7) and every
+  other commit send the letters, and Space keeps them English. A tone key still
+  completes the syllable (`ai3` gives 抹), a prefix of the word shows zhuyin, and Tab
+  shows the zhuyin symbols. An unrecorded run behaves as before.
+- UL-14 Recorded short words live in `short-english.tsv` (`word<TAB>last use`), at most
+  500 words, least recently used dropped, with the same robustness rules as UL-7.
+  "Clear learned choices" clears it too.
 
 ## Acceptance cases
 
@@ -71,6 +83,9 @@ Behavior tests in `crates/keyflip-core/tests/user.rs`:
 - Without a user model the engine behaves exactly as before (evaluation unchanged).
 - `doc` suggests `tor`; after `docker` is typed and committed twice it suggests `ker`;
   once is not enough; `my_docker` and `docker2` are not counted.
+- `ai<E>` gives ㄇㄛ; after `ai<T><E>` once, `ai<E>` gives `ai`, `ai3<E>` gives 抹,
+  `ai<T><E>` gives ㄇㄛ, `ai ` stays English, and `a` alone still shows ㄇ; `a` and
+  `my_ai` flipped with Tab are not recorded.
 
 ## Not doing
 
@@ -78,5 +93,6 @@ Behavior tests in `crates/keyflip-core/tests/user.rs`:
   typed): it records far more of what is typed, and the lexicon order is already right
   for those. English words are counted for completion only (UL-11).
 - Syncing between machines. The files can be copied by hand.
-- Learning for English judgment (Chinese or English). It keeps using key structure and
-  the word list only; learning affects completion (UL-11), not the language decision.
+- Learning for English judgment beyond UL-13. The decision keeps using key structure
+  and the word list; the only learned exception is a short word the maintainer has
+  explicitly flipped with Tab.

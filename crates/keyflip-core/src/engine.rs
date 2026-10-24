@@ -54,6 +54,8 @@ struct Group {
     fixed: Option<String>,
     /// Length of a hand-picked candidate starting here (UL-1).
     picked: Option<usize>,
+    /// A pending letter the user kept as English (UL-13).
+    kept: bool,
 }
 
 impl Group {
@@ -64,6 +66,7 @@ impl Group {
             wide: false,
             fixed: None,
             picked: None,
+            kept: false,
         }
     }
 
@@ -74,6 +77,7 @@ impl Group {
             wide: false,
             fixed: None,
             picked: None,
+            kept: false,
         }
     }
 
@@ -229,8 +233,11 @@ impl Engine {
                 if self.accept_suggestion() {
                     return true;
                 }
-                if !self.pending.is_empty() {
+                if self.kept_word().is_some() {
                     self.pending_to_latin();
+                    self.flip_to_symbols();
+                } else if !self.pending.is_empty() {
+                    self.pending_to_kept();
                 } else {
                     self.flip_last();
                 }
@@ -450,12 +457,13 @@ impl Engine {
         let symbols = zhuyin::symbols_of_keys(&raw).unwrap_or_default();
         let all_letters = raw.iter().all(|c| c.is_ascii_alphabetic());
         let word: String = raw.iter().collect();
-        let prefer_english = all_letters
+        let common_word = all_letters
             && self
                 .eng
                 .rank(&word)
                 .is_some_and(|r| r < self.opt.english_rank_cutoff)
             && self.lex.best_char_count(&symbols) < self.opt.rare_char_count;
+        let prefer_english = common_word || self.kept_word().is_some();
         let mut full = raw.clone();
         full.push(' ');
         if self.lex.is_syllable(&symbols) && !prefer_english {
@@ -505,6 +513,7 @@ impl Engine {
             wide: self.full_width,
             fixed: None,
             picked: None,
+            kept: false,
         }
     }
 
@@ -520,11 +529,32 @@ impl Engine {
         }
     }
 
+    /// Tab on pending keys: English letters, recorded if committed alone (UL-13).
+    fn pending_to_kept(&mut self) {
+        let start = self.cursor;
+        self.pending_to_latin();
+        for g in &mut self.groups[start..self.cursor] {
+            g.kept = true;
+        }
+    }
+
+    /// The pending keys spell a short word the user keeps as English (UL-13).
+    fn kept_word(&self) -> Option<String> {
+        let user = self.user.as_ref()?;
+        let word: String = self.pending.iter().collect();
+        let user = user.lock().unwrap_or_else(|e| e.into_inner());
+        user.keeps_english(&word).then_some(word)
+    }
+
     /// Committing: unfinished zhuyin leaves as the symbols shown (MI-7); a
     /// single punctuation key leaves as punctuation.
     fn pending_to_symbols(&mut self) {
         if self.pending_is_lone_punct() {
             self.flush_pending();
+            return;
+        }
+        if self.kept_word().is_some() {
+            self.pending_to_kept();
             return;
         }
         let keys = std::mem::take(&mut self.pending);
@@ -958,8 +988,9 @@ impl Engine {
         out
     }
 
-    /// Lowercase words with nothing glued to either side (UL-11).
-    fn committed_words(&self) -> Vec<String> {
+    /// Lowercase words with nothing glued to either side (UL-11), and whether
+    /// every letter was kept as English with Tab (UL-13).
+    fn committed_words(&self) -> Vec<(String, bool)> {
         let letter = |g: &Group| matches!(g.kind, Kind::Latin) && g.ch.is_ascii_lowercase();
         let glue = |g: &Group| !g.is_syllable() && (is_word_char(g.ch) || g.ch == '/');
         let mut out = Vec::new();
@@ -976,7 +1007,8 @@ impl Engine {
             let glued_before = start > 0 && glue(&self.groups[start - 1]);
             let glued_after = i < self.groups.len() && glue(&self.groups[i]);
             if !glued_before && !glued_after {
-                out.push(self.groups[start..i].iter().map(|g| g.ch).collect());
+                let span = &self.groups[start..i];
+                out.push((span.iter().map(|g| g.ch).collect(), span.iter().all(|g| g.kept)));
             }
         }
         out
@@ -992,8 +1024,11 @@ impl Engine {
                 for (readings, text, context) in picks {
                     user.learn(&readings, &text, &context);
                 }
-                for word in words {
+                for (word, kept) in words {
                     user.learn_word(&word);
+                    if kept {
+                        user.learn_short(&word);
+                    }
                 }
             }
         }
@@ -1016,7 +1051,10 @@ impl Engine {
         let texts = self.group_texts();
         let mut preedit = Vec::new();
         let mut cursor16 = 0usize;
-        let pending_text = zhuyin::symbols_of_keys(&self.pending).unwrap_or_default();
+        let pending_text = self
+            .kept_word()
+            .or_else(|| zhuyin::symbols_of_keys(&self.pending))
+            .unwrap_or_default();
         let selected = match &self.window {
             Some(w) => Some(w.target),
             None if self.cursor < self.groups.len() => Some(self.cursor),

@@ -180,3 +180,28 @@ fn typed_english_words_become_completions() {
     assert_eq!(suggestion(&feed(&mut e, "doc")).as_deref(), Some("ker"));
     assert_eq!(commit(&mut e, "<T><E>"), "docker");
 }
+
+fn pending(snap: &Snapshot) -> Option<String> {
+    snap.preedit
+        .iter()
+        .find(|s| s.kind == keyflip_core::SegKind::Pending)
+        .map(|s| s.text.clone())
+}
+
+#[test]
+fn short_words_flipped_with_tab_stay_english() {
+    let f = Fixture::new();
+    let mut e = f.engine();
+    assert_eq!(commit(&mut e, "ai<E>"), "ㄇㄛ");
+    commit(&mut e, "my<S-->ai<T><E>");
+    commit(&mut e, "a<T><E>");
+    assert_eq!(commit(&mut e, "ai<E>"), "ㄇㄛ", "glued or single letters are not recorded");
+
+    assert_eq!(commit(&mut e, "ai<T><E>"), "ai");
+    assert_eq!(pending(&feed(&mut e, "ai")).as_deref(), Some("ai"));
+    assert_eq!(commit(&mut e, "<E>"), "ai");
+    assert_eq!(commit(&mut e, "ai3<E>"), "抹");
+    assert_eq!(commit(&mut e, "ai<T><E>"), "ㄇㄛ");
+    assert_eq!(commit(&mut e, "ai su3<E>"), "ai 你");
+    assert_eq!(pending(&feed(&mut e, "a")).as_deref(), Some("ㄇ"));
+}

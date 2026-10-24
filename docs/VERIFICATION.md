@@ -262,6 +262,17 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
 - Published as GitHub release `v0.1.0`; the downloaded asset has the same sha256.
 - Hand test (maintainer): typing a password directly with keyflip active works.
 
+### 2026-10-24 Short words kept as English (UL-13, UL-14)
+
+- Maintainer report: `ai` then Enter sent ㄇㄛ (MI-7 as specified). Now a word of 2 to
+  4 letters flipped with Tab and committed alone is recorded in `short-english.tsv`;
+  afterwards its pending keys show as letters and commit as letters, while a tone key
+  still converts (`ai3` gives 抹).
+- `cargo test --workspace` passes (new: behavior test
+  `short_words_flipped_with_tab_stay_english`, model test
+  `short_words_round_trip_and_are_capped`, store test extended). `keyflip-cli eval`
+  unchanged from the previous baseline. `cargo clippy --workspace` clean.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

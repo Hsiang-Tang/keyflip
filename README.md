@@ -65,7 +65,9 @@ The input menu has "Open User Dictionary Folder"
 
 - `phrases.txt`: your own words, one per line as `text<Tab>readings`, for example
   `鍵翻<Tab>ㄐㄧㄢˋ ㄈㄢ`. Picked up when you switch back to keyflip.
-- `learned.tsv` and `english.tsv`: what keyflip learned. Delete a line to forget it,
+- `learned.tsv`, `english.tsv`, and `short-english.tsv`: what keyflip learned. A short
+  word such as `ai` that you turn into English with Tab once stays English the next
+  time (`ai3` still gives 抹). Delete a line to forget it,
   or use "Clear Learned Choices" (the old files are kept as `.bak`).
 
 ## Documentation map

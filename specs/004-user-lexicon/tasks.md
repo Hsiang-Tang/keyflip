@@ -12,3 +12,6 @@
 - T-UL-3 macOS menu and activation reload. Requirements UL-6, UL-9. Verification: hand
   test in `specs/002-platform-shells/macos.md`. Status: menu and learned picks hand-tested (2026-10-21);
   phrases and clear not yet tried by hand.
+- T-UL-5 Short words flipped with Tab stay English. Requirements UL-13, UL-14.
+  Verification: behavior test `short_words_flipped_with_tab_stay_english`, model and
+  store tests; evaluation unchanged. Status: done (2026-10-24).

@@ -15,8 +15,8 @@ corruption.
 - `keyflip-core` holds the user model in memory only (`user::UserModel`): parsing,
   serializing, learning, and ranking, with no I/O. Every session shares one model.
 - `keyflip-ffi` owns the files in `~/Library/Application Support/keyflip/`:
-  `phrases.txt` (written by the user, never rewritten), `learned.tsv` and
-  `english.tsv` (written by keyflip after a commit that learned something).
+  `phrases.txt` (written by the user, never rewritten), `learned.tsv`,
+  `english.tsv`, and `short-english.tsv` (written by keyflip after a commit that learned something).
 - Files are UTF-8 text with explanatory headers. Writes go through a temporary file
   and a rename. Malformed lines are skipped; a written file that had any is copied to
   `.corrupt` and rewritten clean. Clearing keeps `.bak` copies.

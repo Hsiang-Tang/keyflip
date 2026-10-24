@@ -15,11 +15,20 @@ pub const ENGLISH_CAP: usize = 2_000;
 /// Uses after which an English word is suggested (UL-11).
 const USES_FOR_COMPLETION: u32 = 2;
 pub const ENGLISH_LEN: std::ops::RangeInclusive<usize> = 5..=20;
+/// Short words kept as English after a Tab flip (UL-13, UL-14).
+pub const SHORT_CAP: usize = 500;
+pub const SHORT_LEN: std::ops::RangeInclusive<usize> = 2..=4;
 
 const ENGLISH_HEADER: &str = "\
 # keyflip learned English words for completion, written by keyflip. A word is
 # suggested once it has been typed twice. Delete a line to forget it.
 # word\ttimes typed\tlast use (order only)
+";
+
+const SHORT_HEADER: &str = "\
+# keyflip short words kept as English, written by keyflip. A word is added when
+# it is turned into English with Tab. Delete a line to forget it.
+# word\tlast use (order only)
 ";
 
 pub const PHRASES_HEADER: &str = "\
@@ -47,6 +56,8 @@ pub struct UserModel {
     /// (readings joined by spaces, text) -> context reading -> use.
     learned: HashMap<(String, String), HashMap<String, Use>>,
     english: HashMap<String, Use>,
+    /// Word -> last use.
+    short: HashMap<String, u64>,
     seq: u64,
     generation: u64,
 }
@@ -55,6 +66,10 @@ fn valid_reading(r: &str) -> bool {
     !r.is_empty()
         && r.chars().any(|c| ('ㄅ'..='ㄩ').contains(&c))
         && r.chars().all(|c| ('ㄅ'..='ㄩ').contains(&c) || "ˊˇˋ˙".contains(c))
+}
+
+fn is_short_word(w: &str) -> bool {
+    SHORT_LEN.contains(&w.len()) && w.bytes().all(|b| b.is_ascii_lowercase())
 }
 
 fn content_lines(text: &str) -> impl Iterator<Item = &str> {
@@ -166,8 +181,67 @@ impl UserModel {
     pub fn clear_learned(&mut self) {
         self.learned.clear();
         self.english.clear();
+        self.short.clear();
         self.seq = 0;
         self.generation += 1;
+    }
+
+    /// Records a short word turned into English with Tab (UL-13).
+    pub fn learn_short(&mut self, word: &str) {
+        if !is_short_word(word) {
+            return;
+        }
+        self.seq += 1;
+        self.short.insert(word.to_owned(), self.seq);
+        self.evict_short();
+        self.generation += 1;
+    }
+
+    pub fn keeps_english(&self, word: &str) -> bool {
+        self.short.contains_key(word)
+    }
+
+    pub fn short_len(&self) -> usize {
+        self.short.len()
+    }
+
+    /// Returns the number of malformed lines, which are skipped.
+    pub fn load_short(&mut self, text: &str) -> usize {
+        self.short.clear();
+        let mut bad = 0;
+        for line in content_lines(text) {
+            let parsed = match line.split('\t').collect::<Vec<_>>()[..] {
+                [word, last] if is_short_word(word) => last.parse::<u64>().ok().map(|l| (word, l)),
+                _ => None,
+            };
+            let Some((word, last)) = parsed else {
+                bad += 1;
+                continue;
+            };
+            self.seq = self.seq.max(last);
+            self.short.insert(word.to_owned(), last);
+        }
+        self.evict_short();
+        self.generation += 1;
+        bad
+    }
+
+    /// Oldest first.
+    pub fn short_tsv(&self) -> String {
+        let mut rows: Vec<(u64, &String)> = self.short.iter().map(|(w, &l)| (l, w)).collect();
+        rows.sort();
+        let mut out = String::from(SHORT_HEADER);
+        for (last, w) in rows {
+            out.push_str(&format!("{w}\t{last}\n"));
+        }
+        out
+    }
+
+    fn evict_short(&mut self) {
+        while self.short.len() > SHORT_CAP {
+            let oldest = self.short.iter().min_by_key(|(_, &l)| l).map(|(w, _)| w.clone());
+            self.short.remove(&oldest.expect("not empty"));
+        }
     }
 
     /// Counts a committed English word if it qualifies (UL-11).
@@ -389,6 +463,28 @@ mod tests {
         let mut n = UserModel::default();
         assert_eq!(n.load_english(&format!("{text}bad line\nab\t1\t1\n")), 2);
         assert_eq!(n.english_tsv(), text);
+    }
+
+    #[test]
+    fn short_words_round_trip_and_are_capped() {
+        let mut m = UserModel::default();
+        for w in ["ai", "a", "AI", "a1", "abcde", "jp"] {
+            m.learn_short(w);
+        }
+        assert_eq!(m.short_len(), 2);
+        assert!(m.keeps_english("ai") && m.keeps_english("jp"));
+        let text = m.short_tsv();
+        let mut n = UserModel::default();
+        assert_eq!(n.load_short(&format!("{text}a\t1\nok\n")), 2);
+        assert_eq!(n.short_tsv(), text);
+
+        let letters = || b'a'..=b'z';
+        let words = letters().flat_map(|a| letters().flat_map(move |b| letters().map(move |c| [a, b, c])));
+        for w in words.take(SHORT_CAP) {
+            n.learn_short(std::str::from_utf8(&w).unwrap());
+        }
+        assert_eq!(n.short_len(), SHORT_CAP);
+        assert!(!n.keeps_english("ai"), "oldest dropped");
     }
 
     #[test]
