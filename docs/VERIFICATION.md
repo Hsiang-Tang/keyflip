@@ -297,6 +297,17 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   windows measure about 10 dB above the score alone; peak -2.9 dB. Checked by
   measurement only, not by listening.
 
+### 2026-10-25 Old icon at the text cursor
+
+- Maintainer report: the indicator at the text cursor still showed the old generic
+  keyboard icon. Text Input Sources reports `MenuIcon.pdf` from the installed bundle for
+  the input method and its mode, and the installed `AppIcon.icns` and `MenuIcon.pdf`
+  match `macos/Resources/`, so the bundle is right and the icon was cached.
+- Launch Services also held two stale copies of the bundle (`macos/build/` and a
+  temporary release folder); both were unregistered and the installed bundle
+  re-registered. `TextInputMenuAgent`, `iconservicesagent` and `CursorUIViewService`
+  (the cursor indicator) were restarted. If the old icon remains, log out and back in.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate
