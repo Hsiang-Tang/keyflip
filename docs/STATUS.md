@@ -33,6 +33,9 @@ repository is public. macOS is the only supported platform (ADR-0008). Learning
 - Password fields (PS-7): keys pass through under secure input; the keychain prompt
   accepted the password after the fix.
 - Release: Developer ID signed, notarized, stapled (`dist/keyflip-0.1.1-macos-arm64.zip`).
+- Demo film (005-demo-film): `keyflip-cli trace` with an in-memory user model; the film
+  and README GIF are rendered from that trace by `node demo/render.mjs all`; automatic
+  layout QA passes.
 
 ## Not verified
 

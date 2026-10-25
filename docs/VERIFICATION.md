@@ -284,6 +284,16 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   misjudged; 8 of 2,925 English + digit tokens changed. The README demo is real
   `keyflip-cli play` output.
 
+### 2026-10-25 Demo film (005-demo-film)
+
+- New `keyflip-cli trace`: JSON per key with an in-memory user model. Unit tests: a word
+  flipped with Tab is remembered within the run (`ai<E>ai<T><E>ai<E>` commits ㄇㄛ, ai,
+  ai), segment kinds and Shift are reported, JSON strings are escaped.
+- `cargo test --workspace` passes (86 tests). `cargo clippy --workspace` clean.
+- `node demo/render.mjs all`: 138 keys replayed from the trace; layout QA every 0.1 s
+  reports OK; film 1920x1080, 60 fps, 33.7 s, 8.9 MB; README GIF 2.3 MB, 8.7 s. Audio
+  peak -3.1 dB, mean -24.1 dB, checked by measurement only.
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

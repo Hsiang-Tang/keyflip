@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>keyflip</title>
+<style>
+:root { --paper: #fbfaf6; --ink: #1d1d1b; --soft: #8a8780; --line: #c9c5bb; --accent: #e07a2e; --accent-wash: #f6dcc4; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); }
+body { font-family: "PingFang TC", "Helvetica Neue", Helvetica, sans-serif; color: var(--ink); }
+#stage { position: absolute; inset: 0; transform-origin: 0 0; }
+#doc { position: absolute; left: 236px; top: 64px; width: 1448px; height: 452px; }
+.line { height: 86px; font-size: 58px; line-height: 86px; white-space: pre; letter-spacing: 0.5px; }
+.seg { position: relative; text-underline-offset: 12px; text-decoration-skip-ink: none; }
+.seg.Pending { text-decoration: underline dotted var(--ink) 3px; }
+.seg.Latin { text-decoration: underline solid var(--accent-wash) 7px; }
+.seg.Selected { text-decoration: underline solid var(--ink) 3px; }
+.seg.Suggestion { color: #b9b5ad; }
+.seg .flash { position: absolute; inset: 6px -2px 2px; background: var(--accent); border-radius: 6px; z-index: -1; }
+.caret { display: inline-block; width: 4px; height: 62px; margin: 0 2px; vertical-align: -10px; background: var(--accent); }
+#caption { position: absolute; left: 236px; top: 532px; font: 600 26px/1 "Helvetica Neue", Helvetica, sans-serif; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); }
+#rule { position: absolute; left: 236px; top: 520px; width: 1448px; height: 0; border-top: 1.5px solid var(--line); }
+#kbd { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+#kbd .case { fill: none; stroke: var(--ink); stroke-width: 2; }
+#kbd .cap { fill: var(--paper); stroke: var(--ink); stroke-width: 1.6; }
+#kbd .top { fill: none; stroke: var(--line); stroke-width: 1.2; }
+#kbd .k.down .cap { fill: var(--accent-wash); stroke: var(--accent); stroke-width: 2.4; }
+#kbd .k.down .top { stroke: var(--accent); }
+#kbd .lat { font: 500 21px "Helvetica Neue", Helvetica, sans-serif; fill: var(--ink); }
+#kbd .sym { font: 400 27px "PingFang TC", sans-serif; fill: var(--ink); }
+#kbd .mod { font: 400 16px "Helvetica Neue", Helvetica, sans-serif; fill: var(--soft); }
+#end { position: absolute; inset: 0; background: var(--paper); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; }
+#end .mark { font: 700 132px/1 "Helvetica Neue", Helvetica, sans-serif; letter-spacing: -3px; }
+#end .mark i { font-style: normal; color: var(--accent); }
+#end .tag { margin-top: 34px; font: 400 40px/1.3 "PingFang TC", sans-serif; color: var(--ink); }
+#end .url { margin-top: 26px; font: 400 28px/1 "Helvetica Neue", Helvetica, sans-serif; color: var(--soft); letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="doc"></div>
+  <div id="rule"></div>
+  <div id="caption"></div>
+  <svg id="kbd" viewBox="0 0 1920 1080"></svg>
+</div>
+<div id="end">
+  <div class="mark">key<i>flip</i></div>
+  <div class="tag">打注音，英文自己會來。</div>
+  <div class="url">github.com/Hsiang-Tang/keyflip</div>
+</div>
+<script src="scene.js"></script>
+</body>
+</html>

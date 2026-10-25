@@ -17,11 +17,14 @@ The non-negotiable principles are in `.specify/memory/constitution.md`.
 - `docs/`: product definition, architecture, roadmap, current status, verification
   log, typing habits, and `adr/` (decision records).
 - `crates/keyflip-core`: the engine. Key event in, full snapshot out. No system APIs.
-- `crates/keyflip-cli`: simulator (`play`) and evaluator (`eval`).
+- `crates/keyflip-cli`: simulator (`play`), JSON key trace (`trace`), and evaluator (`eval`).
 - `crates/keyflip-proto`: wire protocol. `crates/keyflip-server` and
   `crates/keyflip-tsf`: Windows engine service and thin text-service shell, frozen
   (ADR-0008, macOS only).
 - `crates/keyflip-ffi` and `macos/`: C interface and thin Swift shell for macOS.
+- `demo/`: product demo film rendered from the engine's key trace
+  (`specs/005-demo-film`); `demo/keyflip-demo.gif` is the README GIF, `demo/out/` is
+  ignored.
 - `installer/`: Windows install and uninstall scripts.
 - `tools/`: lexicon and English word list build scripts, Windows cross-build script.
 - `data/`: compiled lexicon and English word list, produced by

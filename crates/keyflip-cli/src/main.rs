@@ -1,11 +1,13 @@
 //! keyflip-cli
 //!
 //! - `play <keys>`: feed key notation to the engine and print every snapshot.
+//! - `trace <keys>`: one JSON object per key, with an in-memory user model (005-demo-film).
 //! - `eval`: measure Chinese-stays-Chinese and English-detected rates.
 
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
-use keyflip_core::{parse_keys, Engine, English, Lexicon, Options};
+use keyflip_core::user::UserModel;
+use keyflip_core::{parse_keys, Engine, English, KeyCode, KeyEvent, Lexicon, Options, Snapshot};
 
 fn run(engine: &mut Engine, keys: &str) -> String {
     let mut committed = String::new();
@@ -47,6 +49,65 @@ fn play(keys: &str) {
         );
     }
     println!("committed: {committed:?}");
+}
+
+fn json_str(s: &str) -> String {
+    let mut out = String::from("\"");
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
+}
+
+fn code_name(code: KeyCode) -> String {
+    match code {
+        KeyCode::Char(c) => c.to_string(),
+        other => format!("{other:?}"),
+    }
+}
+
+fn trace_line(ev: &KeyEvent, snap: &Snapshot) -> String {
+    let segs: Vec<String> = snap
+        .preedit
+        .iter()
+        .map(|s| format!("{{\"text\":{},\"kind\":\"{:?}\"}}", json_str(&s.text), s.kind))
+        .collect();
+    let cands = match &snap.candidates {
+        Some(c) => {
+            let items: Vec<String> = c.items.iter().take(c.page_size).map(|i| json_str(i)).collect();
+            format!("{{\"items\":[{}],\"selected\":{}}}", items.join(","), c.selected)
+        }
+        None => "null".into(),
+    };
+    format!(
+        "{{\"code\":{},\"text\":{},\"shift\":{},\"handled\":{},\"commit\":{},\"preedit\":[{}],\"cursor\":{},\"candidates\":{}}}",
+        json_str(&code_name(ev.code)),
+        ev.text.map(|c| json_str(&c.to_string())).unwrap_or_else(|| "null".into()),
+        ev.shift,
+        snap.handled,
+        json_str(&snap.commit),
+        segs.join(","),
+        snap.cursor,
+        cands
+    )
+}
+
+/// Every key's snapshot as JSON lines. The user model lives only in memory, so a word
+/// flipped with Tab is remembered for the rest of the run and nothing touches the disk.
+fn trace(keys: &str) -> Vec<String> {
+    let events = parse_keys(keys).unwrap_or_else(|e| {
+        eprintln!("error: {e}");
+        std::process::exit(2);
+    });
+    let mut engine = keyflip_core::bundled_engine(Options::default())
+        .with_user(Arc::new(Mutex::new(UserModel::default())));
+    events.iter().map(|ev| trace_line(ev, &engine.handle_key(*ev))).collect()
 }
 
 /// Keys that type one reading (tone included).
@@ -233,10 +294,47 @@ fn main() {
     let mut args = std::env::args().skip(1);
     match args.next().as_deref() {
         Some("play") => play(&args.next().unwrap_or_default()),
+        Some("trace") => trace(&args.next().unwrap_or_default())
+            .iter()
+            .for_each(|line| println!("{line}")),
         Some("eval") => eval(),
         _ => {
-            eprintln!("usage: keyflip-cli play <keys> | eval");
+            eprintln!("usage: keyflip-cli play <keys> | trace <keys> | eval");
             std::process::exit(2);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn commits(keys: &str) -> Vec<String> {
+        trace(keys)
+            .into_iter()
+            .filter_map(|l| {
+                let i = l.find("\"commit\":\"")? + 10;
+                let rest = &l[i..];
+                let s = &rest[..rest.find('"')?];
+                (!s.is_empty()).then(|| s.to_string())
+            })
+            .collect()
+    }
+
+    #[test]
+    fn a_word_flipped_with_tab_is_remembered_within_the_run() {
+        assert_eq!(commits("ai<E>ai<T><E>ai<E>"), ["ㄇㄛ", "ai", "ai"]);
+    }
+
+    #[test]
+    fn trace_reports_segment_kinds_and_shift() {
+        let lines = trace("Gi");
+        assert!(lines[0].contains("\"shift\":true") && lines[0].contains("\"kind\":\"Latin\""));
+        assert!(trace("s")[0].contains("\"kind\":\"Pending\""));
+    }
+
+    #[test]
+    fn json_strings_are_escaped() {
+        assert_eq!(json_str("a\"b\\c\n"), "\"a\\\"b\\\\c\\u000a\"");
     }
 }

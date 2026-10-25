@@ -1,0 +1,23 @@
+{
+  "fps": 60,
+  "intro": 1.2,
+  "outro": 3.6,
+  "beats": [
+    { "keys": "au/6wu0_m/4", "caption": "Just type Zhuyin" },
+    { "keys": "GitHub_", "caption": "Shift for capitals" },
+    { "keys": "d9_PR_eo3" },
+    { "keys": "team", "caption": "Zhuyin flips to English", "slow": 0.26, "push": 1.22 },
+    { "keys": "_review<E><E>" },
+    { "keys": "jp6ru04y94", "pause": 0.5 },
+    { "keys": "src/ai/main.rs<E><E>", "caption": "Paths stay English" },
+    { "keys": "ru42k6e/4vup_", "pause": 0.5 },
+    { "keys": "docu", "caption": "Tab completes", "push": 1.22, "pushBeats": 2 },
+    { "keys": "<T>", "pause": 0.55, "hold": 0.9 },
+    { "keys": "<E><E>" },
+    { "keys": "5k4103ai", "pause": 0.5, "caption": "Tab fixes a wrong guess", "push": 1.22, "pushBeats": 2 },
+    { "keys": "<T>", "pause": 0.7, "hold": 0.6 },
+    { "keys": "_ai6vu/6e/45jp3<E><E>" },
+    { "keys": "vu84h4283ai", "pause": 0.5, "caption": "Remembered next time", "push": 1.22, "hold": 0.6 },
+    { "keys": "_ru.4ru45j4xk7<E>" }
+  ]
+}

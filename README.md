@@ -15,6 +15,12 @@ If a judgment is wrong, press Tab to flip between Chinese and English. Enter com
 exactly what the composition shows. Everything else behaves like Microsoft
 New Zhuyin.
 
+![Typing a mixed Chinese and English message with keyflip](demo/keyflip-demo.gif)
+
+Every frame is drawn from the engine's own keystroke trace (`keyflip-cli trace`), not
+mocked. The full 34 s film, with path handling, Tab completion, a corrected guess and a
+remembered word, is rebuilt with `node demo/render.mjs all` (`demo/`).
+
 ## Demo
 
 Real output of the core simulator, `keyflip-cli play '<keys>'` (`<E>` is Enter,
