@@ -291,8 +291,11 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   ai), segment kinds and Shift are reported, JSON strings are escaped.
 - `cargo test --workspace` passes (86 tests). `cargo clippy --workspace` clean.
 - `node demo/render.mjs all`: 138 keys replayed from the trace; layout QA every 0.1 s
-  reports OK; film 1920x1080, 60 fps, 33.7 s, 8.9 MB; README GIF 2.3 MB, 8.7 s. Audio
-  peak -3.1 dB, mean -24.1 dB, checked by measurement only.
+  reports OK, including "keyboard never cropped"; film 1920x1080, 60 fps, 33.7 s; README
+  GIF 0.56 MB, 8.7 s. Focus grows the typed line in place instead of zooming the frame,
+  so every pressed key stays visible. Key sounds are CC0 blue-switch recordings; key
+  windows measure about 10 dB above the score alone; peak -2.9 dB. Checked by
+  measurement only, not by listening.
 
 ### Not verified
 

@@ -7,4 +7,4 @@
   Requirements DF-3 to DF-6. Verification: stills reviewed. Status: done (2026-10-25).
 - T-DF-3 Renderer, QA, contact sheet. Requirements DF-8, DF-9. Status: done (2026-10-25).
 - T-DF-4 Score and clicks, MP4 and GIF, README embed. Requirement DF-7. Status: done (2026-10-25); the MP4
-  (8.9 MB) stays in `demo/out/`.
+  (3.4 MB) stays in `demo/out/`.

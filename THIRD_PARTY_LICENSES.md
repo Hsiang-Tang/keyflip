@@ -116,3 +116,14 @@ International License (CC BY-SA 4.0): https://creativecommons.org/licenses/by-sa
 `NOTICE`) and is distributed under the same license. The wordfreq code is licensed
 under Apache-2.0 and is not included in this repository; it is only used by
 `tools/build_english.py`.
+
+## Freesound recordings (demo/sounds/ key sounds for the demo film)
+
+Both recordings are released under Creative Commons 0 (public domain dedication); no
+attribution is required, and it is given here anyway. Cut ranges are in
+`demo/sounds/SOURCES.md`.
+
+- "Typing on a keyboard" by SamsterBirdies (Cherry MX Blue):
+  https://freesound.org/people/SamsterBirdies/sounds/489424/
+- "spacebarKey.wav" by UberBosser (blue switches):
+  https://freesound.org/people/UberBosser/sounds/421582/

@@ -1,9 +1,10 @@
-"""Score and key clicks for the demo film, synthesised from scratch (no samples, no third-party music).
+"""Score and key sounds for the demo film. The score is synthesised; key sounds are CC0 recordings.
 usage: python3 -I demo/music.py TIMELINE.json OUT.wav
 A calm D-major pad (Dmaj9 / Bm7 / Gmaj7 / A6sus, one chord per 2 bars at 94 bpm), a sparse electric-piano
-motif with a soft swell at each beat start, and one quiet key click per key down from the timeline.
+motif with a soft swell at each beat start, kept under blue-switch key sounds: a press on key down and a
+release on key up from the timeline (sounds/, sources in sounds/SOURCES.md; synthesised ticks if absent).
 Standard library only, so it runs wherever the renderer runs."""
-import array, json, math, random, struct, sys, wave
+import array, os, json, math, random, struct, sys, wave
 
 SR = 48000
 timeline = json.load(open(sys.argv[1], encoding="utf-8")); out = sys.argv[2]
@@ -60,7 +61,7 @@ for b in range(0, bars, 2):
     c = CH[(b // 2) % 4]
     for j, m in enumerate(c):
         pan = 0.5 + 0.3 * math.sin(j * 1.9)
-        add(b * BAR - 0.4, pad(m, 2 * BAR + 2.5, 0.0011 * (j + 1)), 0.022 * (1.2 - pan), 0.022 * (0.2 + pan))
+        add(b * BAR - 0.4, pad(m, 2 * BAR + 2.5, 0.0011 * (j + 1)), 0.014 * (1.2 - pan), 0.014 * (0.2 + pan))
 
 # sparse motif: two or three notes per bar, chord tones an octave up
 MOTIF = [(0, 4), (1.5, 2), (3, 3)]
@@ -70,7 +71,7 @@ for b in range(bars):
     for q, (beat, idx) in enumerate(MOTIF):
         if b % 2 and q == 2: continue
         pan = 0.3 + 0.4 * ((b + q) % 3) / 2
-        add(t0 + beat * BEAT, epiano(c[idx] + 12), 0.032 * (1 - pan), 0.032 * pan)
+        add(t0 + beat * BEAT, epiano(c[idx] + 12), 0.02 * (1 - pan), 0.02 * pan)
 
 # a soft swell at each beat start: the current chord root and fifth, one octave up
 for beat in timeline.get("beats", []):
@@ -78,14 +79,44 @@ for beat in timeline.get("beats", []):
     if t < 0.5 or t > DUR - 2: continue
     c = CH[(int(t / BAR) // 2) % 4]
     for m in (c[0] + 12, c[1] + 12):
-        add(t, pad(m, 3.0, 0.002), 0.02, 0.02)
+        add(t, pad(m, 3.0, 0.002), 0.013, 0.013)
 
-# key clicks, panned slightly by key position so the board has width
+# key sounds: CC0 blue-switch recordings from sounds/ (see sounds/SOURCES.md) when present,
+# a press click on key down and a softer release click on key up; synthesised ticks otherwise
+HERE = os.path.dirname(os.path.abspath(__file__))
+def load(path):
+    with wave.open(path) as w:
+        assert w.getframerate() == SR and w.getsampwidth() == 2
+        ch = w.getnchannels(); raw = array.array("h", w.readframes(w.getnframes()))
+    return [raw[i] / 32768 for i in range(0, len(raw), ch)]
+def bank(prefix):
+    d = os.path.join(HERE, "sounds")
+    names = sorted(f for f in os.listdir(d) if f.startswith(prefix) and f.endswith(".wav")) if os.path.isdir(d) else []
+    return [load(os.path.join(d, f)) for f in names]
+def vary(s):
+    # a few percent of pitch and level, so repeated keys never sound identical
+    r = 1 + rng.uniform(-0.035, 0.035); g = 10 ** (rng.uniform(-2.5, 1.0) / 20)
+    n = int(len(s) / r)
+    return [g * (s[min(int(k * r), len(s) - 1)]) for k in range(n)]
+PRESS, RELEASE, SPACE = bank("press-"), bank("release-"), bank("space-")
+shift_up = -1.0
 for key in timeline.get("keys", []):
-    code = str(key.get("code", "")); row = int(key.get("row", 2))
+    code = str(key.get("code", "")); row = int(key.get("row", 2)); t = float(key["t"])
+    up = float(key.get("up", t + 0.09))
+    if code == "Shift":
+        if t < shift_up + 0.04:
+            shift_up = up; continue  # Shift held through several capitals sounds once
+        shift_up = up
     x = (ord(code[0].lower()) % 13) / 12 if len(code) == 1 else 0.5
     pan = 0.4 + 0.2 * x
-    add(float(key["t"]), click(code, row), 0.32 * (1 - pan) * 2, 0.32 * pan * 2)
+    if PRESS:
+        big = code in DEEP
+        down = rng.choice(SPACE) if big and SPACE else rng.choice(PRESS)
+        add(t, vary(down), 0.62 * (1 - pan) * 2, 0.62 * pan * 2)
+        if RELEASE:
+            add(up, vary(rng.choice(RELEASE)), 0.42 * (1 - pan) * 2, 0.42 * pan * 2)
+    else:
+        add(t, click(code, row), 0.32 * (1 - pan) * 2, 0.32 * pan * 2)
 
 # master: 1 s fade in, 2 s fade out, normalise to -3 dBFS
 fi, fo = SR * 1.0, SR * 2.0

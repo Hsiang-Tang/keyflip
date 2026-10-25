@@ -2,7 +2,7 @@
 // The renderer calls film.load(timeline) once, then film.seek(t) for every frame.
 "use strict";
 
-const U = 98, KX = (1920 - 14.5 * U) / 2, KY = 584, GAP = 7;
+const U = 94, KX = (1920 - 14.5 * U) / 2, KY = 566, GAP = 7;
 const ZHUYIN = {
   1: "ㄅ", 2: "ㄉ", 3: "ˇ", 4: "ˋ", 5: "ㄓ", 6: "ˊ", 7: "˙", 8: "ㄚ", 9: "ㄞ", 0: "ㄢ", "-": "ㄦ",
   q: "ㄆ", w: "ㄊ", e: "ㄍ", r: "ㄐ", t: "ㄔ", y: "ㄗ", u: "ㄧ", i: "ㄛ", o: "ㄟ", p: "ㄣ",
@@ -122,16 +122,23 @@ function renderCaption(t) {
   $("caption").style.opacity = alpha.toFixed(3);
 }
 
-function renderCamera(t, lineIndex) {
-  let s = 1;
+// Focus: the line being typed grows in place and the other lines step back. The keyboard
+// never moves, so every pressed key stays in frame (DF-6).
+function renderFocus(t) {
+  let k = 0, scale = 1;
   for (const p of T.pushes) {
-    const up = ease((t - p.t) / 0.8), down = 1 - ease((t - p.end) / 0.9);
-    s = Math.max(s, 1 + (p.scale - 1) * Math.min(up, down));
+    const amount = Math.min(ease((t - p.t) / 0.6), 1 - ease((t - p.end) / 0.7));
+    if (amount > k) { k = amount; scale = p.scale; }
   }
-  const fy = 64 + 86 * lineIndex + 43;
-  const stage = $("stage");
-  stage.style.transformOrigin = `760px ${fy}px`;
-  stage.style.transform = `scale(${s.toFixed(4)})`;
+  const lines = [...document.querySelectorAll(".line")];
+  lines.forEach((line, i) => {
+    if (i === lines.length - 1) {
+      line.style.transformOrigin = "0 35%";
+      line.style.transform = `scale(${(1 + (scale - 1) * k).toFixed(4)})`;
+    } else {
+      line.style.opacity = (1 - 0.65 * k).toFixed(3);
+    }
+  });
 }
 
 window.film = {
@@ -141,27 +148,25 @@ window.film = {
     this.seek(0);
   },
   seek(t) {
-    const line = renderDoc(t);
+    renderDoc(t);
     renderKeys(t);
     renderCaption(t);
-    renderCamera(t, line);
+    renderFocus(t);
     $("end").style.opacity = ease((t - T.endCard) / 0.7).toFixed(3);
   },
   // Safe-margin and overlap check for QA (DF-8): returns problems at this time.
   qa() {
     const out = [];
-    const doc = $("doc").getBoundingClientRect(), cap = $("caption").getBoundingClientRect();
-    const scale = parseFloat(($("stage").style.transform.match(/scale\(([\d.]+)\)/) || [0, 1])[1]);
-    if (scale === 1) {
-      for (const line of document.querySelectorAll(".line")) {
-        if (line.getBoundingClientRect().bottom > KY - 30) out.push("text overlaps keyboard");
-        const range = document.createRange(); range.selectNodeContents(line);
-        const box = range.getBoundingClientRect();
-        if (box.right > 1920 - 64 || box.left < 64) out.push(`line outside margin: ${line.textContent}`);
-      }
-      if (doc.top < 40) out.push("document above margin");
-      if ($("caption").textContent && cap.bottom > KY - 22) out.push("caption overlaps keyboard");
+    const cap = $("caption").getBoundingClientRect();
+    for (const line of document.querySelectorAll(".line")) {
+      const range = document.createRange(); range.selectNodeContents(line);
+      const box = range.getBoundingClientRect();
+      if (box.bottom > KY - 30) out.push(`text overlaps keyboard: ${line.textContent}`);
+      if (box.right > 1920 - 64 || box.left < 64 || box.top < 40) out.push(`line outside margin: ${line.textContent}`);
     }
+    if ($("caption").textContent && cap.bottom > KY - 22) out.push("caption overlaps keyboard");
+    const kbd = document.querySelector("#kbd .case").getBoundingClientRect();
+    if (kbd.bottom > 1080 || kbd.top < 0 || kbd.left < 0 || kbd.right > 1920) out.push("keyboard cropped");
     return out;
   },
 };

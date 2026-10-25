@@ -15,7 +15,7 @@ demo/music.py  ── synthesized score and key clicks from the key times ──
   `window.film.seek(t)`, the renderer advances time frame by frame. No video framework
   dependency; `playwright-core` drives the installed Google Chrome.
 - `script.json` lists beats. Each beat has keys in the acceptance notation, a typing
-  rhythm, an optional caption, and an optional camera push. `render.mjs` expands it into
+  rhythm, an optional caption, and an optional focus (the typed line grows in place). `render.mjs` expands it into
   timed key events with a seeded random jitter, calls `keyflip-cli trace` once for the
   whole message (so learning carries across beats), and writes `out/timeline.json`.
 - The keyboard is drawn in SVG from a layout table (rows, key widths, letter, Zhuyin
@@ -23,8 +23,9 @@ demo/music.py  ── synthesized score and key clicks from the key times ──
   the visual language of the network-switch-anatomy film.
 - Committed text lands in a message area above the live composition; the composition
   shows the engine's preedit with DF-4 styles and a caret at the reported cursor.
-- Audio: `music.py` writes a soft pad and a click per key down (pitch varies by key row),
-  numpy only; `ffmpeg` mixes and encodes.
+- Audio: `music.py` writes a soft synthesized pad under blue-switch key sounds cut from CC0
+  Freesound recordings (`demo/sounds/`, sources in `SOURCES.md`): a press on key down, a
+  release on key up, small pitch and level variation; standard library only.
 
 ## Where things go
 

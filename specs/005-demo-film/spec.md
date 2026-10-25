@@ -33,14 +33,17 @@ measurements: no statistics on screen.
   typed again and kept English. Each beat may show one caption of at most four English
   words, small, outside the text area.
 - DF-6 Motion: typing at a human rhythm (about 8 to 10 keys per second with small
-  variation); the camera is still except a slow push toward the composition on the
-  flip, completion, and correction beats; no shake, flash, rotation, or overshoot; a
-  finished line holds at least 1.2 s before the next.
-- DF-7 Outputs: an MP4 with a quiet score and key clicks; a README GIF of the opening
+  variation). The frame never moves: on the flip, completion, correction, and memory
+  beats the line being typed grows in place (about 1.3x, from its left edge) while the
+  other lines dim, so the keyboard and every pressed key stay fully in frame. No shake,
+  rotation, or overshoot; a finished line holds at least 1.2 s before the next.
+- DF-7 Outputs: an MP4 with a quiet score under clicky (blue-switch) key sounds from CC0
+  recordings, a press click on key down and a softer release click on key up; a README GIF of the opening
   beats, at most 5 MB. Files over 10 MB are not committed (repository rule); the MP4 is
   kept locally and attached to a release on request.
 - DF-8 QA: an automatic check every 0.1 s that text and captions stay inside a 64 px
-  safe margin and do not overlap the keyboard, plus a contact sheet of stills.
+  safe margin and do not overlap the keyboard, and that the keyboard is never cropped,
+  plus a contact sheet of stills.
 - DF-9 Reproducible: one command rebuilds the trace, frames, audio, MP4, and GIF from
   the script.
 

@@ -65,11 +65,11 @@ function buildTimeline() {
       if (e.shift) {
         t += 0.05;
         presses.push({ id: "Shift", down: t - 0.07, up: t + 0.08 });
-        music.push({ t: t - 0.07, code: "Shift", row: 3 });
+        music.push({ t: t - 0.07, up: t + 0.08, code: "Shift", row: 3 });
       }
       events.push({ ...e, t, flash: flashes(prev, e.preedit, e.code) });
       presses.push({ id: keyId(e.code), down: t, up: t + 0.09 });
-      music.push({ t, code: e.code, row: ROW[e.code] ?? 4 });
+      music.push({ t, up: t + 0.09, code: e.code, row: ROW[e.code] ?? 4 });
       prev = e.preedit;
       t += step;
       if (tok === "<E>" && !e.handled) t += 0.55;
