@@ -307,6 +307,7 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   temporary release folder); both were unregistered and the installed bundle
   re-registered. `TextInputMenuAgent`, `iconservicesagent` and `CursorUIViewService`
   (the cursor indicator) were restarted. If the old icon remains, log out and back in.
+- Hand test: the cursor indicator now shows the arrow icon.
 
 ### Not verified
 

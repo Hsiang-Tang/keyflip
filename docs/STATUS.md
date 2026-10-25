@@ -41,7 +41,6 @@ repository is public. macOS is the only supported platform (ADR-0008). Learning
 
 - Hand test of the macOS checklist items added for the grid, caret position, CapsLock,
   MI-24, completion panel, and the user lexicon menu and learning.
-- The input source switcher icon (macOS icon cache).
 
 ## Blockers
 
