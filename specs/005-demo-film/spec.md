@@ -46,6 +46,8 @@ measurements: no statistics on screen.
   plus a contact sheet of stills.
 - DF-9 Reproducible: one command rebuilds the trace, frames, audio, MP4, and GIF from
   the script.
+- DF-10 Social preview: a 1280x640 image of the finished message, from the same
+  scene, for the repository's link preview.
 
 ## Not doing
 

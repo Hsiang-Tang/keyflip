@@ -3,24 +3,16 @@
 A Zhuyin (Bopomofo) input method that decides by itself whether you are typing
 Chinese or English. No Shift or CapsLock toggling.
 
-```
-My name is Hsiang in a Chinese sentence    hold Shift for H; the lowercase letters that follow join the English word
-use github in a Chinese sentence           "github" cannot form valid Zhuyin syllables, so it is judged English
-```
-
-(The sentences above are shown in English; the real input is Zhuyin keystrokes
-mixed with Latin letters.)
-
-If a judgment is wrong, press Tab to flip between Chinese and English. Enter commits
-exactly what the composition shows. Everything else behaves like Microsoft
-New Zhuyin.
-
 ![Typing a mixed Chinese and English message with keyflip](demo/keyflip-demo.gif)
 
 Every frame is drawn from the engine's own keystroke trace (`keyflip-cli trace`), not
 mocked. The [full 34 s film with sound](https://github.com/Hsiang-Tang/keyflip/releases/download/v0.1.1/keyflip-demo.mp4),
 with path handling, Tab completion, a corrected guess and a remembered word, is rebuilt
 with `node demo/render.mjs all` (`demo/`).
+
+If a judgment is wrong, press Tab to flip between Chinese and English. Enter commits
+exactly what the composition shows. Everything else behaves like Microsoft
+New Zhuyin.
 
 ## Demo
 
@@ -50,7 +42,7 @@ run, no user model):
 | English words, ranks 0 to 10,000 | 10,000 | 21 misjudged (0.2%) |
 | English + digit tokens | 2,925 | 8 changed (0.3%) |
 
-`cargo test --workspace` passes the same day: 83 tests, one of which runs all 54
+On 2026-10-25 `cargo test --workspace` passes 86 tests, one of which runs all 54
 acceptance cases.
 
 ## Status

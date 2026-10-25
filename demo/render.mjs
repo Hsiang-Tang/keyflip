@@ -1,5 +1,5 @@
 // Demo film director (specs/005-demo-film).
-// usage: node demo/render.mjs timeline|stills|qa|video|gif|all
+// usage: node demo/render.mjs timeline|stills|qa|video|gif|poster|all
 // timeline: expand script.json into timed keys and replay them through `keyflip-cli trace`.
 // The page draws a frame as a function of time; this script seeks it 1/fps s per frame,
 // screenshots it, and ffmpeg encodes the frames with the score from music.py.
@@ -188,9 +188,22 @@ function gif(timeline) {
   console.log(`gif: ${(fs.statSync(gifOut).size / 1e6).toFixed(2)} MB, ${timeline.gifEnd.toFixed(1)} s`);
 }
 
+// Social preview (DF-10): the finished message just before the end card, padded to 2:1.
+async function poster(timeline) {
+  const frame = path.join(out, "poster-frame.png"), png = path.join(out, "social-preview.png");
+  await withPage(timeline, async (page) => {
+    await seek(page, timeline.endCard - 0.2);
+    await page.screenshot({ path: frame });
+  });
+  execFileSync(FFMPEG, ["-y", "-loglevel", "error", "-i", frame,
+    "-vf", "pad=2160:1080:120:0:color=0xfbfaf6,scale=1280:640:flags=lanczos", png]);
+  console.log("poster: out/social-preview.png");
+}
+
 const timeline = mode === "timeline" || mode === "all" || !fs.existsSync(path.join(out, "timeline.json"))
   ? buildTimeline() : JSON.parse(fs.readFileSync(path.join(out, "timeline.json"), "utf8"));
 if (mode === "qa" || mode === "all") await qa(timeline);
 if (mode === "stills" || mode === "all") await stills(timeline);
 if (mode === "video" || mode === "all") await video(timeline);
 if (mode === "gif" || mode === "all") gif(timeline);
+if (mode === "poster" || mode === "all") await poster(timeline);

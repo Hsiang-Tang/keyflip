@@ -8,3 +8,5 @@
 - T-DF-3 Renderer, QA, contact sheet. Requirements DF-8, DF-9. Status: done (2026-10-25).
 - T-DF-4 Score and clicks, MP4 and GIF, README embed. Requirement DF-7. Status: done (2026-10-25); the MP4
   (3.4 MB) stays in `demo/out/`.
+- T-DF-5 Social preview image (`render.mjs poster`). Requirement DF-10. Verification:
+  image reviewed. Status: done (2026-10-25); uploaded by hand in repository settings.
