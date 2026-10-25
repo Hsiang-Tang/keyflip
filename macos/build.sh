@@ -6,6 +6,8 @@
 #   macos/build.sh --sign "<identity>"  sign with a certificate and the hardened runtime
 #                                       (used by macos/release.sh; implies --no-install)
 #
+# With rustup the input method is universal (Apple Silicon and Intel) and runs on
+# macOS 12 or later. A Rust without rustup builds only this Mac's architecture.
 # Needs: Rust (rustup), Xcode command line tools (swiftc, codesign). No admin rights.
 set -euo pipefail
 
@@ -28,36 +30,47 @@ if [ -f "$HOME/.cargo/env" ]; then
   . "$HOME/.cargo/env"
 fi
 
-ARCH="$(uname -m)"                       # arm64 or x86_64
-case "$ARCH" in
-  arm64)  RUST_TARGET=aarch64-apple-darwin ;;
-  x86_64) RUST_TARGET=x86_64-apple-darwin ;;
-  *) echo "unsupported architecture: $ARCH" >&2; exit 1 ;;
-esac
+if command -v rustup >/dev/null 2>&1; then
+  ARCHS="arm64 x86_64"
+  rustup target add aarch64-apple-darwin x86_64-apple-darwin >/dev/null
+else
+  ARCHS="$(uname -m)"
+  echo "note: no rustup; building $ARCHS only" >&2
+fi
 
 OUT="$ROOT/macos/build"
 APP="$OUT/Keyflip.app"
-LIBDIR="$OUT/rust/$RUST_TARGET/release"
-
 export MACOSX_DEPLOYMENT_TARGET=12.0
-echo "== Rust engine ($RUST_TARGET)"
-if command -v rustup >/dev/null 2>&1; then rustup target add "$RUST_TARGET" >/dev/null; fi
-CARGO_TARGET_DIR="$OUT/rust" cargo build --release --target "$RUST_TARGET" -p keyflip-ffi
 
-echo "== Swift shell"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp macos/Info.plist "$APP/Contents/Info.plist"
 cp -R macos/Resources/. "$APP/Contents/Resources/"
-swiftc -O -swift-version 5 \
-  -module-name Keyflip \
-  -target "${ARCH}-apple-macos12.0" \
-  -import-objc-header macos/Bridging.h \
-  -Xcc "-I$ROOT/crates/keyflip-ffi/include" \
-  -L "$LIBDIR" -lkeyflip_ffi \
-  -framework Cocoa -framework InputMethodKit \
-  macos/Sources/*.swift \
-  -o "$APP/Contents/MacOS/Keyflip"
+
+SLICES=()
+for ARCH in $ARCHS; do
+  case "$ARCH" in
+    arm64)  RUST_TARGET=aarch64-apple-darwin ;;
+    x86_64) RUST_TARGET=x86_64-apple-darwin ;;
+    *) echo "unsupported architecture: $ARCH" >&2; exit 1 ;;
+  esac
+  echo "== Rust engine ($RUST_TARGET)"
+  CARGO_TARGET_DIR="$OUT/rust" cargo build --release --target "$RUST_TARGET" -p keyflip-ffi
+  echo "== Swift shell ($ARCH)"
+  swiftc -O -swift-version 5 \
+    -module-name Keyflip \
+    -target "${ARCH}-apple-macos12.0" \
+    -import-objc-header macos/Bridging.h \
+    -Xcc "-I$ROOT/crates/keyflip-ffi/include" \
+    -L "$OUT/rust/$RUST_TARGET/release" -lkeyflip_ffi \
+    -framework Cocoa -framework InputMethodKit \
+    macos/Sources/*.swift \
+    -o "$OUT/Keyflip-$ARCH"
+  SLICES+=("$OUT/Keyflip-$ARCH")
+done
+lipo -create "${SLICES[@]}" -output "$APP/Contents/MacOS/Keyflip"
+rm -f "${SLICES[@]}"
+lipo -info "$APP/Contents/MacOS/Keyflip"
 
 if [ -n "$SIGN_ID" ]; then
   echo "== Sign ($SIGN_ID, hardened runtime)"

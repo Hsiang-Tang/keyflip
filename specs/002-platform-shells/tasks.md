@@ -24,3 +24,7 @@
 - T-PS-10 Signed and notarized macOS release. Verification: `macos/release.sh` produces
   a stapled zip that `spctl` accepts. Status: done (2026-10-21); first notarized build
   `keyflip-0.1.0-macos-arm64.zip`.
+- T-PS-11 Universal release for Apple Silicon and Intel on macOS 12 or later.
+  Verification: with rustup, `macos/build.sh` makes one binary with arm64 and x86_64
+  slices; `macos/release.sh` checks that each slice has minimum macOS 12.0, then
+  notarizes `keyflip-<version>-macos.zip`. Status: done (2026-10-25), `v0.1.2`.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build a signed, notarized release of the keyflip input method (Apple Silicon).
+# Build a signed, notarized, universal release of the keyflip input method.
 #
 #   KEYFLIP_SIGN_ID="Developer ID Application: <name> (<team>)" \
 #   KEYFLIP_NOTARY_PROFILE=keyflip \
@@ -9,8 +9,9 @@
 #   1. Xcode > Settings > Accounts > Manage Certificates > + > Developer ID Application
 #   2. xcrun notarytool store-credentials keyflip --apple-id <id> --team-id <team>
 #      (asks for an app-specific password from account.apple.com)
+#   3. rustup (https://rustup.rs) for the universal build and macOS 12 support
 #
-# Output: dist/keyflip-<version>-macos-arm64.zip, stapled, ready to publish.
+# Output: dist/keyflip-<version>-macos.zip, stapled, ready to publish.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -22,15 +23,26 @@ case "$KEYFLIP_SIGN_ID" in
   "Developer ID Application:"*) ;;
   *) echo "notarization needs a Developer ID Application identity, not: $KEYFLIP_SIGN_ID" >&2; exit 2 ;;
 esac
-if [ "$(uname -m)" != arm64 ]; then
-  echo "releases are built on Apple Silicon" >&2; exit 2
+if [ -f "$HOME/.cargo/env" ]; then
+  # shellcheck disable=SC1091
+  . "$HOME/.cargo/env"
+fi
+if ! command -v rustup >/dev/null 2>&1; then
+  echo "releases need rustup for the universal build" >&2; exit 2
 fi
 
 VERSION="$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' macos/Info.plist)"
 APP="macos/build/Keyflip.app"
-ZIP="dist/keyflip-$VERSION-macos-arm64.zip"
+ZIP="dist/keyflip-$VERSION-macos.zip"
 
 bash macos/build.sh --sign "$KEYFLIP_SIGN_ID"
+
+# Every slice must load on macOS 12 (no object built for a newer system).
+for ARCH in arm64 x86_64; do
+  MINOS="$(vtool -arch "$ARCH" -show-build "$APP/Contents/MacOS/Keyflip" | awk '/minos/ {print $2}')"
+  echo "$ARCH minos $MINOS"
+  [ "$MINOS" = "12.0" ] || { echo "unexpected minimum macOS for $ARCH: $MINOS" >&2; exit 1; }
+done
 
 mkdir -p dist
 rm -f "$ZIP"

@@ -48,8 +48,8 @@ acceptance cases.
 ## Status
 
 - Core engine: complete, tests pass (`crates/keyflip-core`).
-- macOS shell: builds and installs on Apple Silicon and is in daily use by the
-  maintainer; the full hand-test checklist is not yet complete (`macos/`,
+- macOS shell: universal (Apple Silicon and Intel, macOS 12 or later) and in daily use
+  by the maintainer on Apple Silicon; the full hand-test checklist is not yet complete (`macos/`,
   `crates/keyflip-ffi`).
 - Learning: picks from the candidate window, your own phrases, and English words you
   type are remembered on this Mac (`specs/004-user-lexicon/`).
@@ -80,8 +80,8 @@ with `macos/release.sh` (setup steps in its header).
 
 ## Install a release
 
-1. Download `keyflip-<version>-macos-arm64.zip` from the GitHub releases page (Apple
-   Silicon, macOS 12 or later) and unzip it.
+1. Download `keyflip-<version>-macos.zip` from the GitHub releases page (Apple
+   Silicon and Intel, macOS 12 or later) and unzip it.
 2. Move `Keyflip.app` into `~/Library/Input Methods` (in Finder: Go > Go to Folder).
 3. Log out and back in, then add it in System Settings > Keyboard > Text Input >
    Input Sources > Edit > + > Chinese, Traditional > keyflip 注音.

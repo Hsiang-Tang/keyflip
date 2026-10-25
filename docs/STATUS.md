@@ -1,13 +1,14 @@
 # Current status
 
-Updated: 2026-10-24.
+Updated: 2026-10-25.
 
 ## In one sentence
 
 The engine and the macOS shell are complete and in daily use by the maintainer; the
 repository is public. macOS is the only supported platform (ADR-0008). Learning
-(004-user-lexicon) is hand-tested for picks and English completion. Release `v0.1.1`
-(signed, notarized) is published on GitHub.
+(004-user-lexicon) is hand-tested for picks and English completion. Release `v0.1.2`
+(signed, notarized, universal for Apple Silicon and Intel, macOS 12 or later) is
+published on GitHub.
 
 ## Verified
 
@@ -32,7 +33,8 @@ repository is public. macOS is the only supported platform (ADR-0008). Learning
   English words misjudged (0.2%). Evaluation runs without a user model.
 - Password fields (PS-7): keys pass through under secure input; the keychain prompt
   accepted the password after the fix.
-- Release: Developer ID signed, notarized, stapled (`dist/keyflip-0.1.1-macos-arm64.zip`).
+- Release: Developer ID signed, notarized, stapled, universal
+  (`dist/keyflip-0.1.2-macos.zip`).
 - Demo film (005-demo-film): `keyflip-cli trace` with an in-memory user model; the film
   and README GIF are rendered from that trace by `node demo/render.mjs all`; automatic
   layout QA passes.
@@ -41,6 +43,7 @@ repository is public. macOS is the only supported platform (ADR-0008). Learning
 
 - Hand test of the macOS checklist items added for the grid, caret position, CapsLock,
   MI-24, completion panel, and the user lexicon menu and learning.
+- The universal build on an Intel Mac or on macOS 12 (no such machine here).
 
 ## Blockers
 

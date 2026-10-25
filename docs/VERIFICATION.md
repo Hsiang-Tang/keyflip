@@ -309,6 +309,22 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   (the cursor indicator) were restarted. If the old icon remains, log out and back in.
 - Hand test: the cursor indicator now shows the arrow icon.
 
+### 2026-10-25 Universal release (T-PS-11)
+
+- rustup (stable, both macOS targets) is installed in the home folder; `build.sh`
+  loads it from `~/.cargo/env`, so the build no longer uses Homebrew's Rust, whose
+  standard library targets the build machine's macOS.
+- `bash macos/build.sh --no-install`: `lipo` lists x86_64 and arm64, `vtool` shows
+  minos 12.0 for both slices, no linker warnings.
+- `cargo test --workspace` passes; `cargo test -p keyflip-core --target
+  x86_64-apple-darwin` passes under Rosetta. `keyflip-cli eval` output identical to
+  2026-10-24.
+- `macos/release.sh`: notarization Accepted (b82bcf5e-9017-42e6-9168-1d950534b053),
+  stapled, `spctl` reports Notarized Developer ID. `dist/keyflip-0.1.2-macos.zip`
+  (sha256 52b2aae01709df49b2af5b30362bbda013375d71b2d5ea890e6a5404c531710c). Released as `v0.1.2` (build 3); the input method itself is unchanged
+  since `v0.1.1`.
+- Not run: an Intel Mac or macOS 12 (no such machine here).
+
 ### Not verified
 
 - TSF registration (`regsvr32`) and all real typing behavior (composition, candidate

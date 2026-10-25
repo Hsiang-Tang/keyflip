@@ -16,7 +16,9 @@ administrator rights**.
 
 - Rust engine and C interface: tests pass, and static libraries build for
   `aarch64-apple-darwin` and `x86_64-apple-darwin`.
-- Swift shell: builds, signs ad hoc, and installs on Apple Silicon (2026-10-21).
+- Swift shell: builds, signs ad hoc, and installs on Apple Silicon (2026-10-21). With
+  rustup the app is universal (arm64 and x86_64, minimum macOS 12.0, 2026-10-25); the
+  x86_64 engine tests pass under Rosetta. Not yet run on an Intel Mac or on macOS 12.
 - Real typing behavior: not yet verified; the checklist is at the end of this file.
 
 ## Requirements

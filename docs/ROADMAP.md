@@ -34,6 +34,8 @@ macOS is the only supported platform (ADR-0008).
 11. Signing and notarization: done 2026-10-21 (`macos/release.sh`, Apple Silicon zip).
 12. First public release: done 2026-10-21, GitHub release `v0.1.0` with the notarized
     zip; install steps in `README.md`.
+13. Universal release (Apple Silicon and Intel, macOS 12 or later): done 2026-10-25,
+    `v0.1.2`.
 
 ## Explicitly not doing
 
