@@ -18,8 +18,9 @@ New Zhuyin.
 ![Typing a mixed Chinese and English message with keyflip](demo/keyflip-demo.gif)
 
 Every frame is drawn from the engine's own keystroke trace (`keyflip-cli trace`), not
-mocked. The full 34 s film, with path handling, Tab completion, a corrected guess and a
-remembered word, is rebuilt with `node demo/render.mjs all` (`demo/`).
+mocked. The [full 34 s film with sound](https://github.com/Hsiang-Tang/keyflip/releases/download/v0.1.1/keyflip-demo.mp4),
+with path handling, Tab completion, a corrected guess and a remembered word, is rebuilt
+with `node demo/render.mjs all` (`demo/`).
 
 ## Demo
 
