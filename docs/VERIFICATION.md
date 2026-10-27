@@ -336,6 +336,9 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
 
 ### 2026-10-27 Self-install on first open (T-PS-12)
 
+- Release `v0.1.3` built, signed (hardened runtime, Apple events entitlement), notarized
+  (Accepted), stapled; `spctl` accepts it.
+
 - `bash macos/build.sh --no-install` builds the universal app with `Installer.swift`; the
   ad hoc signature verifies.
 - Not run yet: the install itself (it changes the user's Input Methods folder). Hand test
