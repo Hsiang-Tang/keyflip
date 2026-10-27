@@ -74,7 +74,7 @@ lipo -info "$APP/Contents/MacOS/Keyflip"
 
 if [ -n "$SIGN_ID" ]; then
   echo "== Sign ($SIGN_ID, hardened runtime)"
-  codesign --force --options runtime --timestamp --sign "$SIGN_ID" "$APP"
+  codesign --force --options runtime --timestamp --entitlements macos/Keyflip.entitlements --sign "$SIGN_ID" "$APP"
 else
   echo "== Sign (ad hoc, local use only)"
   codesign --force --sign - "$APP"

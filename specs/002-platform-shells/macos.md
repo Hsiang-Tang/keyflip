@@ -43,7 +43,9 @@ The script builds the Rust engine, builds the Swift shell, signs ad hoc
 (`codesign -s -`), and copies the app to `~/Library/Input Methods/Keyflip.app`. To build
 without installing, use `bash macos/build.sh --no-install`; output goes to `macos/build/`.
 
-After the first install:
+Opening `Keyflip.app` from Downloads installs it for you (PS-13): it copies itself to
+`~/Library/Input Methods`, registers the input source and offers to log you out when the
+system needs that. `build.sh` copies the app directly instead. After the first install:
 
 1. Log out and back in once.
 2. Open System Settings, Keyboard, Text Input, Input Sources, Edit, then `+`.
@@ -91,6 +93,17 @@ Then remove "keyflip Zhuyin" in System Settings and log out and back in.
 ## Manual acceptance checklist
 
 Standard: each item must match `specs/001-mixed-input/acceptance.md`.
+
+Self-install (PS-13), on a user with no keyflip installed:
+
+- [ ] Open `Keyflip.app` from Downloads: an Install/Cancel dialog asks first (Cancel changes
+      nothing); after Install a dialog says it is installed; the app is now in
+      `~/Library/Input Methods` and the input source is registered.
+- [ ] If keyflip 注音 is not yet in the input menu, the dialog offers "Log Out Now" and
+      "Later"; "Log Out Now" shows the system logout confirmation.
+- [ ] After login, keyflip 注音 can be added or selected without opening the folder.
+- [ ] Opening the app from Downloads again (an update) replaces the copy, asks no logout.
+- [ ] Switching to keyflip 注音 launches the installed copy and shows no dialog.
 
 - [ ] Notes: type `su3cl3` then Enter; the Chinese for "hello" appears.
 - [ ] `Hsiang` (hold Shift for H) then Enter; `Hsiang` appears.

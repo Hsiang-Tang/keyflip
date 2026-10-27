@@ -35,6 +35,15 @@ engine and shell.
   rights; registering a TSF on Windows does (ADR-0005).
 - PS-11 The Windows shell does not import `comctl32` and passes NULL for `hklsubstitute` at
   registration (pitfalls found in ruhi).
+- PS-13 Self-install on macOS. Opening `Keyflip.app` from anywhere except
+  `~/Library/Input Methods` (Downloads, a translocated path, a mounted image) installs it:
+  stop any running copy, replace `~/Library/Input Methods/Keyflip.app`, register and enable
+  the input source, then tell the user the result in a dialog. It first asks for consent
+  (Install or Cancel); Cancel changes nothing. If the system does not list
+  the input source yet, the dialog offers "Log Out Now" (the system's own confirmation) or
+  "Later"; if it is listed, no logout is asked. An update over an installed copy never asks
+  for logout. A copy that already sits in an Input Methods folder runs as the input method
+  and shows no dialog. The user never has to find the folder or know about logging out.
 
 ## Protocol (keyflip-proto)
 

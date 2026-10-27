@@ -28,3 +28,7 @@
   Verification: with rustup, `macos/build.sh` makes one binary with arm64 and x86_64
   slices; `macos/release.sh` checks that each slice has minimum macOS 12.0, then
   notarizes `keyflip-<version>-macos.zip`. Status: done (2026-10-25), `v0.1.2`.
+- T-PS-12 macOS self-install on first open. Requirement PS-13. Verification: build
+  succeeds; hand test from a fresh download on a clean user (open `Keyflip.app` from
+  Downloads, dialog appears, input source is listed or logout works); an update run asks
+  no logout. Status: code done, hand test pending.

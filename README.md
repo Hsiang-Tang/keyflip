@@ -80,12 +80,12 @@ with `macos/release.sh` (setup steps in its header).
 
 ## Install a release
 
-1. Download `keyflip-<version>-macos.zip` from the GitHub releases page (Apple
-   Silicon and Intel, macOS 12 or later) and unzip it.
-2. Move `Keyflip.app` into `~/Library/Input Methods` (in Finder: Go > Go to Folder).
-3. Log out and back in, then add it in System Settings > Keyboard > Text Input >
-   Input Sources > Edit > + > Chinese, Traditional > keyflip 注音.
-4. Turn off "Use the Caps Lock key to switch to and from ABC" in the same place, so
+1. Download `keyflip-<version>-macos.zip` from the GitHub releases page and double-click
+   it in Finder to unzip.
+2. Double-click `Keyflip.app`. It installs itself and a dialog tells you the one step left
+   (adding it in Keyboard settings, or logging out and back in if macOS needs that).
+   No folders to find, no Terminal.
+3. In Keyboard settings > Input Sources, turn off "Use the Caps Lock key to switch to and from ABC", so
    CapsLock types capitals.
 
 ## Your dictionary
