@@ -351,4 +351,5 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   show keyflip until a login. The source's enabled flag is not reliable; 0.1.4 reads the
   system's enabled list, asks for one logout on a first install and enables the source
   from a one-shot login agent. Release `v0.1.4` signed, notarized (Accepted), stapled.
-- Not run yet: the 0.1.4 flow end to end (hand test, T-PS-12).
+- Hand test of 0.1.4 from a fresh GitHub download on Apple Silicon (macOS 26): install
+  dialog, one logout, keyflip enabled after login. Passed.

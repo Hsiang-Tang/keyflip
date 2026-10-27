@@ -31,4 +31,5 @@
 - T-PS-12 macOS self-install on first open. Requirement PS-13. Verification: build
   succeeds; hand test from a fresh download on a clean user (open `Keyflip.app` from
   Downloads, dialog appears, input source is listed or logout works); an update run asks
-  no logout. Status: code done, hand test pending.
+  no logout. Status: done (2026-10-27, `v0.1.4` hand-tested by the maintainer from a fresh
+  GitHub download).
