@@ -6,7 +6,7 @@ Updated: 2026-10-27.
 
 The engine and the macOS shell are complete and in daily use by the maintainer; the
 repository is public. macOS is the only supported platform (ADR-0008). Learning
-(004-user-lexicon) is hand-tested for picks and English completion. Release `v0.1.3`
+(004-user-lexicon) is hand-tested for picks and English completion. Release `v0.1.4`
 (signed, notarized, universal for Apple Silicon and Intel, macOS 12 or later) is
 published on GitHub.
 
@@ -34,7 +34,7 @@ published on GitHub.
 - Password fields (PS-7): keys pass through under secure input; the keychain prompt
   accepted the password after the fix.
 - Release: Developer ID signed, notarized, stapled, universal
-  (`dist/keyflip-0.1.3-macos.zip`).
+  (`dist/keyflip-0.1.4-macos.zip`).
 - Demo film (005-demo-film): `keyflip-cli trace` with an in-memory user model; the film
   and README GIF are rendered from that trace by `node demo/render.mjs all`; automatic
   layout QA passes.

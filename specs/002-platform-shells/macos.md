@@ -99,10 +99,11 @@ Self-install (PS-13), on a user with no keyflip installed:
 - [ ] Open `Keyflip.app` from Downloads: an Install/Cancel dialog asks first (Cancel changes
       nothing); after Install a dialog says it is installed; the app is now in
       `~/Library/Input Methods` and the input source is registered.
-- [ ] If keyflip 注音 is not yet in the input menu, the dialog offers "Log Out Now" and
-      "Later"; "Log Out Now" shows the system logout confirmation.
-- [ ] After login, keyflip 注音 can be added or selected without opening the folder.
-- [ ] Opening the app from Downloads again (an update) replaces the copy, asks no logout.
+- [ ] First install: a "log out and back in" dialog with Log Out and "I'll Do It Later";
+      Log Out shows the system logout confirmation.
+- [ ] After login, a dialog says keyflip is ready and keyflip 注音 is in the input menu
+      with no manual Add; the login agent plist is gone from `~/Library/LaunchAgents`.
+- [ ] Opening the app from Downloads again (an update) replaces the copy and asks no logout.
 - [ ] Switching to keyflip 注音 launches the installed copy and shows no dialog.
 
 - [ ] Notes: type `su3cl3` then Enter; the Chinese for "hello" appears.

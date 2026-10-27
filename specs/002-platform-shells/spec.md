@@ -36,14 +36,18 @@ engine and shell.
 - PS-11 The Windows shell does not import `comctl32` and passes NULL for `hklsubstitute` at
   registration (pitfalls found in ruhi).
 - PS-13 Self-install on macOS. Opening `Keyflip.app` from anywhere except
-  `~/Library/Input Methods` (Downloads, a translocated path, a mounted image) installs it:
-  stop any running copy, replace `~/Library/Input Methods/Keyflip.app`, register and enable
-  the input source, then tell the user the result in a dialog. It first asks for consent
-  (Install or Cancel); Cancel changes nothing. If the system does not list
-  the input source yet, the dialog offers "Log Out Now" (the system's own confirmation) or
-  "Later"; if it is listed, no logout is asked. An update over an installed copy never asks
-  for logout. A copy that already sits in an Input Methods folder runs as the input method
-  and shows no dialog. The user never has to find the folder or know about logging out.
+  `~/Library/Input Methods` (Downloads, a translocated path, a mounted image) installs it,
+  guided by dialogs that each have one obvious main button. It first asks for consent
+  (Install or Cancel); Cancel changes nothing. Then it stops any running copy, replaces
+  `~/Library/Input Methods/Keyflip.app`, registers and enables the input source. The
+  system's enabled list (not the source's own flag) decides what happens next: enabled
+  gives a done dialog; not enabled on a first install explains "log out and back in once"
+  with a Log Out button (the system's own confirmation) and installs a one-shot login
+  agent that enables the source after login and removes itself; not enabled on a repeat
+  run shows step-by-step guidance for the Add button in Keyboard settings. A copy that
+  already sits in an Input Methods folder runs as the input method and shows no dialog.
+  The user never has to find a folder, read a README, or use the Add button in the normal
+  case. Uninstall removes the login agent.
 
 ## Protocol (keyflip-proto)
 

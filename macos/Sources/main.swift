@@ -6,6 +6,7 @@ let connectionName = Bundle.main.object(forInfoDictionaryKey: "InputMethodConnec
     ?? "keyflip_Connection"
 
 // Opened from Downloads or anywhere else: install instead of serving as the input method.
+if Installer.isFinishSetupLaunch { Installer.finishSetup() }
 if !Installer.isRunningAsInputMethod { Installer.run() }
 
 // Before any session exists, so every session shares the user files.

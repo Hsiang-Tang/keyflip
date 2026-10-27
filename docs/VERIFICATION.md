@@ -343,3 +343,12 @@ python3 -I -m unittest discover -s tools -p 'test_build*.py'   # lexicon builder
   ad hoc signature verifies.
 - Not run yet: the install itself (it changes the user's Input Methods folder). Hand test
   from a fresh download per the PS-13 items in `specs/002-platform-shells/macos.md`.
+
+### 2026-10-27 Self-install fix after a real run (0.1.4)
+
+- Hand run of 0.1.3 on the maintainer's Mac: after install the source was found and
+  "enabled" by the system API, yet the Keyboard settings list and the Add dialog did not
+  show keyflip until a login. The source's enabled flag is not reliable; 0.1.4 reads the
+  system's enabled list, asks for one logout on a first install and enables the source
+  from a one-shot login agent. Release `v0.1.4` signed, notarized (Accepted), stapled.
+- Not run yet: the 0.1.4 flow end to end (hand test, T-PS-12).
